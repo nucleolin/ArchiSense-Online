@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArchSense — 建築空間體驗研究</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f3ef; --bg2:#ede9e3; --bg3:#e3ddd5;
+  --surface:#ffffff; --surface2:#faf9f7;
+  --border:#d8d2c8; --border2:#c4bdb1;
+  --ink:#1a1714; --ink2:#5a5248; --ink3:#9c9289; --ink4:#bbb4ac;
+  --accent:#2d5a3d; --accent-l:#e8f0ea;
+  --accent2:#7a4f2e; --accent2-l:#f2ebe3;
+  --expert:#334a7a; --expert-l:#e6eaf3;
+  --danger:#8b2020; --danger-l:#f5e6e6;
+  --warn:#7a5c1e; --warn-l:#faf0d8;
+  --ok:#1a5c2a; --ok-l:#e0f0e4;
+  --r:4px; --r2:8px; --r3:12px; --r4:16px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow2:0 4px 20px rgba(0,0,0,.09),0 1px 4px rgba(0,0,0,.04);
+  --topbar-h:52px; --sidebar:320px; --track-h:44px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6}
+.mono{font-family:'IBM Plex Mono',monospace}
+.label-xs{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── SCREENS ── */
+.screen{display:none}
+.screen.active{display:block}
+#app-screen.active{display:flex}
+
+/* ── ONBOARD LAYOUT ── */
+.onboard-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 20px 60px;background:var(--bg);position:relative}
+.onboard-bg{position:fixed;inset:0;pointer-events:none;opacity:.3;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,var(--border) 39px,var(--border) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,var(--border) 39px,var(--border) 40px)}
+.onboard-logo{display:flex;align-items:baseline;gap:2px;margin-bottom:36px;z-index:1}
+.onboard-logo-a{font-size:20px;font-weight:600;letter-spacing:-.3px;color:var(--ink)}
+.onboard-logo-b{font-size:20px;font-weight:300;letter-spacing:-.3px;color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:40px 44px;width:100%;max-width:640px;box-shadow:var(--shadow2);position:relative;z-index:1}
+.card-title{font-size:18px;font-weight:600;letter-spacing:-.2px;margin-bottom:4px}
+.card-sub{font-size:11px;color:var(--ink3);font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;margin-bottom:28px}
+
+/* ── STEP INDICATOR ── */
+.step-bar{display:flex;align-items:center;margin-bottom:10px}
+.step-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'IBM Plex Mono',monospace;flex-shrink:0;transition:all .2s}
+.step-dot.done{background:var(--accent);color:#fff}
+.step-dot.current{background:var(--ink);color:#fff}
+.step-dot.todo{background:var(--bg3);color:var(--ink3);border:1px solid var(--border)}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 5px}
+.step-line.done{background:var(--accent)}
+.step-labels{display:flex;justify-content:space-between;margin-bottom:28px}
+.step-lbl{font-size:9px;font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4);text-align:center;flex:1}
+.step-lbl.current{color:var(--ink2)}
+.step-lbl.done{color:var(--accent)}
+
+/* ── CONSENT ── */
+.consent-body{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px 22px;max-height:320px;overflow-y:auto;font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:16px}
+.consent-body h3{font-size:12px;font-weight:600;color:var(--ink);margin:14px 0 5px;letter-spacing:.01em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace}
+.consent-body h3:first-child{margin-top:0}
+.consent-body p{margin-bottom:8px}
+.consent-body ul{padding-left:18px;margin-bottom:8px}
+.consent-body ul li{margin-bottom:4px}
+.scroll-hint{text-align:center;font-size:10px;color:var(--ink4);font-family:'IBM Plex Mono',monospace;margin-bottom:12px;letter-spacing:.06em;transition:opacity .3s}
+.check-row{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-radius:var(--r2);border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .13s;margin-bottom:8px;user-select:none}
+.check-row:hover{border-color:var(--accent);background:var(--accent-l)}
+.check-row.checked{border-color:var(--accent);background:var(--accent-l)}
+.check-box{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border2);background:var(--surface);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .13s}
+.check-row.checked .check-box{background:var(--accent);border-color:var(--accent)}
+.check-tick{color:#fff;font-size:10px;font-weight:700;display:none}
+.check-row.checked .check-tick{display:block}
+.check-text{font-size:12px;color:var(--ink2);line-height:1.5}
+.email-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:10px 14px;margin:12px 0 6px;display:flex;align-items:center;gap:10px}
+.email-lbl{font-size:11px;color:var(--ink2);white-space:nowrap;font-weight:500}
+.email-input{flex:1;padding:5px 0;background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--ink);font-size:13px;font-family:'IBM Plex Mono',monospace;outline:none;transition:border-color .13s}
+.email-input:focus{border-bottom-color:var(--accent)}
+.email-note{font-size:10px;color:var(--ink4);padding-left:2px;margin-bottom:14px}
+.warn-box{background:var(--warn-l);border:1px solid rgba(122,92,30,.2);border-radius:var(--r2);padding:9px 13px;font-size:11px;color:var(--warn);display:flex;gap:8px;align-items:flex-start}
+
+/* ── FORM ── */
+.field-group{margin-bottom:18px}
+.field-label{display:block;font-size:11px;font-weight:500;color:var(--ink2);margin-bottom:6px}
+.field-sub{font-size:10px;color:var(--ink4);margin-bottom:7px;display:block}
+.radio-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.radio-grid.c3{grid-template-columns:1fr 1fr 1fr}
+.radio-card{padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r2);background:var(--surface2);cursor:pointer;transition:all .13s;text-align:center;font-size:12px;color:var(--ink2)}
+.radio-card:hover{border-color:var(--border2);color:var(--ink)}
+.radio-card.sel{border-color:var(--accent);color:var(--accent);background:var(--accent-l);font-weight:500}
+.yesno-row{display:flex;gap:8px}
+.yn-btn{flex:1;padding:10px;border:1.5px solid var(--border);border-radius:var(--r2);background:var(--surface2);cursor:pointer;transition:all .13s;text-align:center;font-size:13px;color:var(--ink2)}
+.yn-btn.sel.yes{border-color:var(--accent);color:var(--accent);background:var(--accent-l);font-weight:500}
+.yn-btn.sel.no{border-color:var(--border2);color:var(--ink2);background:var(--bg3);font-weight:500}
+
+/* ── PID DISPLAY ── */
+.pid-reveal{background:var(--ink);border-radius:var(--r3);padding:24px 28px;text-align:center;margin:8px 0 20px}
+.pid-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6a6460;margin-bottom:8px}
+.pid-code{font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:500;letter-spacing:.2em;color:#e8f0ea}
+.pid-note{font-size:11px;color:var(--ink3);margin-top:8px;line-height:1.5}
+
+/* ── TUTORIAL CARDS ── */
+.tutorial-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:8px}
+.tut-card{display:flex;gap:16px;align-items:flex-start;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r3)}
+.tut-icon-wrap{width:48px;height:48px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.tut-icon-wrap.green{background:var(--accent-l)}
+.tut-icon-wrap.brown{background:var(--accent2-l)}
+.tut-icon-wrap.blue{background:var(--expert-l)}
+.tut-body{}
+.tut-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.tut-desc{font-size:12px;color:var(--ink2);line-height:1.6}
+.tut-hint{display:inline-block;margin-top:5px;font-size:10px;font-family:'IBM Plex Mono',monospace;background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:2px 7px;color:var(--ink3)}
+
+/* ── PRACTICE SCREEN ── */
+.practice-wrap{min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
+.practice-topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0}
+.practice-badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;background:var(--warn-l);color:var(--warn);border:1px solid rgba(122,92,30,.25)}
+.practice-progress{display:flex;align-items:center;gap:10px;margin-left:auto}
+.prac-task{font-size:12px;color:var(--ink2)}
+.prac-task strong{color:var(--ink)}
+.task-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s;flex-shrink:0}
+.task-check.done{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ── TOOLTIP COACH ── */
+.coach-bubble{position:fixed;z-index:500;background:var(--ink);color:#fff;border-radius:var(--r3);padding:14px 18px;max-width:260px;box-shadow:var(--shadow2);pointer-events:none;transition:opacity .25s,transform .25s}
+.coach-bubble.hidden{opacity:0;transform:translateY(6px)}
+.coach-arrow{position:absolute;width:10px;height:10px;background:var(--ink);transform:rotate(45deg)}
+.coach-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.coach-text{font-size:12px;color:rgba(255,255,255,.75);line-height:1.5}
+.coach-step{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.4);margin-top:6px;letter-spacing:.06em}
+
+/* ── APP SHELL ── */
+#app-screen{height:100vh;flex-direction:column}
+.topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px 0 20px;flex-shrink:0;position:relative;z-index:30}
+.topbar-brand{display:flex;align-items:baseline;gap:1px;font-size:15px;font-weight:600;letter-spacing:-.3px;flex-shrink:0}
+.topbar-brand-a{color:var(--ink)}
+.topbar-brand-b{color:var(--accent);font-weight:300}
+.topbar-div{width:1px;height:18px;background:var(--border);margin:0 14px;flex-shrink:0}
+.topbar-pid{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink3);background:var(--bg2);border:1px solid var(--border);padding:2px 8px;border-radius:20px}
+.topbar-watch{display:flex;align-items:center;gap:8px;margin-left:14px}
+.watch-dot{width:5px;height:5px;border-radius:50%;background:var(--ink4);transition:background .3s;flex-shrink:0}
+.watch-dot.live{background:var(--accent);animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.watch-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink3)}
+.watch-bar-wrap{width:80px;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.watch-bar-fill{height:100%;width:0%;border-radius:2px;background:var(--accent);transition:width .4s}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-sm{padding:6px 14px;border-radius:var(--r);font-size:12px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;transition:all .13s;white-space:nowrap}
+.btn-sm-ghost{background:transparent;border:1px solid var(--border2);color:var(--ink2)}
+.btn-sm-ghost:hover{border-color:var(--ink3);color:var(--ink);background:var(--bg2)}
+.btn-sm-primary{background:var(--accent);color:#fff}
+.btn-sm-primary:hover{opacity:.88}
+.btn-sm-primary:disabled{opacity:.3;cursor:not-allowed}
+.main-wrap{flex:1;display:flex;overflow:hidden}
+.left-col{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.video-stage{background:#000;position:relative;flex-shrink:0;overflow:hidden;width:100%;aspect-ratio:16/9;max-height:52vh}
+.video-stage video{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain}
+.video-stage video{width:100%;display:block;max-height:calc(100vh - var(--topbar-h) - 44px - 180px);object-fit:contain}
+#annotation-canvas{position:absolute;inset:0;pointer-events:none;z-index:5}
+#annotation-canvas.drawing{pointer-events:all;cursor:crosshair}
+#annotation-canvas.boxing{pointer-events:all;cursor:crosshair}
+.drop-zone{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1a1816;cursor:pointer;border:2px dashed #3a3530;transition:border-color .2s,background .2s;gap:10px}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:#1e201d}
+.drop-icon-wrap{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:22px}
+.drop-title{font-size:13px;color:#c8c2ba;font-weight:500}
+.drop-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6b6560;letter-spacing:.08em}
+.drop-or{display:flex;align-items:center;gap:10px;color:#5a5450;font-size:11px;width:240px}
+.drop-or::before,.drop-or::after{content:'';flex:1;height:1px;background:#2e2b28}
+.drop-url-row{display:flex;gap:0;width:280px}
+.drop-url-input{flex:1;padding:8px 12px;background:#252220;border:1px solid #3a3530;border-right:none;border-radius:var(--r) 0 0 var(--r);color:#d8d0c8;font-size:12px;font-family:'IBM Plex Mono',monospace;outline:none;transition:border-color .15s}
+.drop-url-input::placeholder{color:#5a5450}
+.drop-url-input:focus{border-color:var(--accent)}
+.drop-url-btn{padding:8px 14px;background:var(--accent);border:none;border-radius:0 var(--r) var(--r) 0;color:#fff;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.drop-url-btn:hover{opacity:.88}
+#file-input{display:none}
+.ctrl-bar{background:var(--surface);border-top:1px solid var(--border);padding:0 14px;height:44px;display:none;align-items:center;gap:10px;flex-shrink:0}
+.ctrl-bar.visible{display:flex}
+.ctrl-icon-btn{background:none;border:none;color:var(--ink3);cursor:pointer;padding:5px;border-radius:var(--r);display:flex;align-items:center;transition:color .13s,background .13s}
+.ctrl-icon-btn:hover{color:var(--ink);background:var(--bg2)}
+.ctrl-icon-btn svg{width:16px;height:16px}
+.ctrl-time{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink3);white-space:nowrap}
+.ctrl-spacer{flex:1}
+.timeline-section{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column}
+.timeline-topbar{padding:10px 16px 8px;display:flex;align-items:center;justify-content:space-between;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;flex-shrink:0}
+.tool-pills{display:flex;gap:4px}
+.tool-pill{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--ink3);transition:all .13s}
+.tool-pill:hover{border-color:var(--border2);color:var(--ink2)}
+.tool-pill.active{background:var(--accent-l);border-color:var(--accent);color:var(--accent)}
+.tool-pill.active.box{background:var(--accent2-l);border-color:var(--accent2);color:var(--accent2)}
+.tool-pill.active.draw{background:var(--expert-l);border-color:var(--expert);color:var(--expert)}
+.scrubber-wrap{padding:12px 16px 6px;flex-shrink:0}
+.scrubber-times{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink4);margin-bottom:5px}
+.scrubber-track{height:5px;background:var(--bg3);border-radius:3px;position:relative;cursor:pointer}
+.scrubber-watched{position:absolute;top:0;left:0;right:0;height:100%;pointer-events:none}
+.watched-seg{position:absolute;height:100%;background:rgba(45,90,61,.18);border-radius:3px}
+.scrubber-fill{height:100%;background:var(--accent);border-radius:3px;pointer-events:none;transition:width .1s}
+.scrubber-thumb{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.mark-track-wrap{padding:4px 16px;flex-shrink:0}
+.mark-track{height:var(--track-h);background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);position:relative;overflow:visible}
+.mark-track-label{position:absolute;left:10px;top:5px}
+.ann-pip{position:absolute;top:50%;transform:translate(-50%,-50%);width:9px;height:9px;border-radius:50%;cursor:pointer;transition:transform .13s;border:1.5px solid rgba(255,255,255,.5);z-index:2}
+.ann-pip:hover{transform:translate(-50%,-50%) scale(1.6)}
+.ann-pip::after{content:attr(data-label);position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:10px;font-family:'IBM Plex Mono',monospace;padding:3px 7px;border-radius:var(--r);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .13s}
+.ann-pip:hover::after{opacity:1}
+.ann-list{flex:1;overflow-y:auto;padding:6px 16px 16px;display:flex;flex-direction:column;gap:3px}
+.ann-item{display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .13s}
+.ann-item:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.ann-item.selected{border-color:var(--accent);background:var(--accent-l)}
+.ann-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ann-t{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink3)}
+.ann-lbl{font-size:12px;color:var(--ink2);flex:1}
+.ann-del{background:none;border:none;color:var(--ink4);cursor:pointer;font-size:13px;line-height:1;padding:1px 3px;border-radius:3px;transition:all .13s}
+.ann-del:hover{color:var(--danger);background:var(--danger-l)}
+.sidebar{width:var(--sidebar);background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.sidebar-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 4px}
+.s-tab{flex:1;padding:11px 6px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;color:var(--ink3);border-bottom:2px solid transparent;transition:all .13s;white-space:nowrap}
+.s-tab:hover{color:var(--ink2)}
+.s-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.sidebar-body{flex:1;overflow-y:auto}
+.s-section{padding:14px 16px;border-bottom:1px solid var(--border)}
+.s-section:last-child{border-bottom:none}
+.s-pane{display:none}
+.s-pane.active{display:block}
+.emo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px}
+.emo-chip{padding:7px 3px;border-radius:var(--r);font-size:10px;text-align:center;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--ink2);transition:all .13s;line-height:1.4;font-family:'Noto Sans TC',sans-serif}
+.emo-chip:hover{border-color:var(--border2);color:var(--ink);background:var(--surface)}
+.emo-chip.active{border-color:transparent;color:#fff}
+.emo-chip[data-emo="舒適"].active{background:#2d7a4e}
+.emo-chip[data-emo="開闊"].active{background:#1d6a9f}
+.emo-chip[data-emo="壓迫"].active{background:#9b3535}
+.emo-chip[data-emo="溫暖"].active{background:#a06020}
+.emo-chip[data-emo="冷靜"].active{background:#4a5a9a}
+.emo-chip[data-emo="驚喜"].active{background:#8a3a70}
+.emo-chip[data-emo="自然"].active{background:#3d7a30}
+.emo-chip[data-emo="孤寂"].active{background:#5a6070}
+.custom-row{display:flex;gap:6px}
+.custom-input{flex:1;padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--ink);font-size:12px;font-family:inherit;outline:none;transition:border-color .13s}
+.custom-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-l)}
+.mark-btn{padding:7px 12px;border-radius:var(--r);background:var(--accent);color:#fff;border:none;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;transition:opacity .13s;white-space:nowrap}
+.mark-btn:hover{opacity:.88}
+.mark-btn:disabled{opacity:.3;cursor:not-allowed}
+.notes-ta{width:100%;padding:9px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--ink);font-size:12px;font-family:'Noto Sans TC',sans-serif;resize:vertical;outline:none;min-height:72px;line-height:1.6;transition:border-color .13s}
+.notes-ta:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-l)}
+.scale-row{margin-bottom:14px}
+.scale-head{display:flex;justify-content:space-between;margin-bottom:5px}
+.scale-name{font-size:12px;color:var(--ink)}
+.scale-val{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);font-weight:500}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;background:var(--bg3);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px}
+.stat-n{font-size:20px;font-weight:600;color:var(--ink);margin-bottom:2px;font-family:'IBM Plex Mono',monospace}
+.stat-l{font-size:10px;color:var(--ink3)}
+.mini-tl{height:20px;background:var(--bg3);border-radius:var(--r);position:relative;overflow:hidden;margin:8px 0 12px}
+.mini-pip{position:absolute;width:3px;height:100%;transform:translateX(-50%);opacity:.7}
+.emo-bar-item{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.emo-bar-lbl{font-size:10px;color:var(--ink2);width:32px;text-align:right}
+.emo-bar-track{flex:1;height:3px;background:var(--bg3);border-radius:2px}
+.emo-bar-fill{height:100%;border-radius:2px;transition:width .3s}
+.emo-bar-n{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink4);width:14px}
+.export-btn{width:100%;padding:8px;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;background:var(--bg2);border:1px solid var(--border);color:var(--ink2);transition:all .13s;font-family:inherit;text-align:left;display:flex;align-items:center;gap:8px}
+.export-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 20px;border-radius:var(--r);border:none;font-size:13px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:all .13s;letter-spacing:.01em}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{opacity:.3;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--ink2)}
+.btn-ghost:hover{border-color:var(--ink3);background:var(--bg2)}
+.btn-row{display:flex;gap:8px;margin-top:28px;justify-content:flex-end}
+
+/* ── COMPLETION ── */
+.completion-code-box{background:var(--ink);border-radius:var(--r2);padding:20px 24px;text-align:center;margin:16px 0}
+.completion-code{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;letter-spacing:.18em;color:#e8f0ea}
+.completion-code-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6a6460;margin-bottom:8px}
+.completion-step{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:8px}
+.completion-step-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.completion-step-text{font-size:13px;color:var(--ink2);line-height:1.5}
+.research-email{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);background:var(--accent-l);border:1px solid rgba(45,90,61,.2);padding:1px 7px;border-radius:var(--r)}
+
+/* ── BUFFER / WAITING OVERLAY ── */
+.vid-wait-overlay{position:absolute;inset:0;background:rgba(20,18,16,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:20;pointer-events:all}
+.vid-wait-overlay.hidden{display:none}
+.vid-spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.1);border-top-color:#e8f0ea;border-radius:50%;animation:spin .9s linear infinite}
+.vid-wait-title{font-size:13px;font-weight:500;color:#d8d0c8}
+.vid-wait-sub{font-size:11px;color:#6b6560;font-family:'IBM Plex Mono',monospace;letter-spacing:.06em}
+.vid-buffer-bar{width:160px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;margin-top:2px}
+.vid-buffer-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s;width:0%}
+.ctrl-icon-btn:disabled{opacity:.3;cursor:not-allowed}
+
+/* ── PRACTICE GUIDE PANEL ── */
+.prac-guide{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);margin:10px 16px 0;overflow:hidden}
+.prac-guide-header{padding:12px 16px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--accent-l)}
+.prac-guide-title{font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.prac-guide-steps{padding:12px 16px 14px;display:flex;flex-direction:column;gap:0}
+.prac-step-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;position:relative}
+.prac-step-row:not(:last-child)::after{content:'';position:absolute;left:11px;top:28px;bottom:-8px;width:1px;background:var(--border)}
+.prac-step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'IBM Plex Mono',monospace;flex-shrink:0;transition:all .3s;margin-top:1px}
+.prac-step-num.pending{background:var(--bg3);color:var(--ink4);border:1px solid var(--border)}
+.prac-step-num.active{background:var(--ink);color:#fff;box-shadow:0 0 0 3px var(--accent-l)}
+.prac-step-num.done{background:var(--accent);color:#fff}
+.prac-step-body{flex:1}
+.prac-step-title{font-size:12px;font-weight:600;color:var(--ink);line-height:1.4;transition:color .3s}
+.prac-step-row:not(.active-step) .prac-step-title{color:var(--ink3)}
+.prac-step-desc{font-size:11px;color:var(--ink3);line-height:1.5;margin-top:2px;max-height:0;overflow:hidden;transition:max-height .35s ease,opacity .35s;opacity:0}
+.active-step .prac-step-desc{max-height:80px;opacity:1}
+.prac-step-tip{display:inline-block;margin-top:5px;font-size:10px;font-family:'IBM Plex Mono',monospace;background:var(--warn-l);border:1px solid rgba(122,92,30,.2);border-radius:3px;padding:2px 8px;color:var(--warn)}
+.prac-step-tip.green{background:var(--accent-l);border-color:rgba(45,90,61,.2);color:var(--accent)}
+.prac-step-anim{display:inline-flex;gap:4px;margin-top:6px}
+.prac-key-demo{display:inline-block;padding:3px 8px;border:1.5px solid var(--border2);border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;background:var(--surface2);color:var(--ink2);transition:all .15s}
+.prac-key-demo.pulse{animation:keyPulse .6s ease-out}
+@keyframes keyPulse{0%{transform:scale(1);background:var(--accent-l);border-color:var(--accent);color:var(--accent)}60%{transform:scale(1.15)}100%{transform:scale(1);background:var(--surface2);border-color:var(--border2);color:var(--ink2)}}
+
+/* submit overlay */
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,23,20,.7);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center}
+.overlay.visible{display:flex}
+.overlay-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:36px 44px;text-align:center;max-width:420px;width:90%;box-shadow:var(--shadow2)}
+.overlay-icon{font-size:40px;margin-bottom:12px}
+.overlay-title{font-size:17px;font-weight:600;margin-bottom:6px}
+.overlay-body{font-size:13px;color:var(--ink2);margin-bottom:22px;line-height:1.7}
+.overlay-actions{display:flex;gap:8px;justify-content:center}
+
+/* toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--ink);color:#fff;border-radius:var(--r2);padding:9px 18px;font-size:12px;font-weight:500;z-index:600;transition:transform .25s,opacity .25s;opacity:0;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{background:var(--accent)}
+.toast.error{background:var(--danger)}
+
+/* practice task pills */
+.task-pills{display:flex;flex-wrap:wrap;gap:6px}
+.task-pill{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;font-size:11px;border:1px solid var(--border);background:var(--surface2);color:var(--ink3);transition:all .2s}
+.task-pill.done{border-color:var(--accent);background:var(--accent-l);color:var(--accent)}
+.task-pill-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:all .2s}
+.task-pill.done .task-pill-dot{background:var(--accent)}
+
+@media(max-width:720px){
+  .card{padding:28px 22px}
+  .main-wrap{flex-direction:column}
+  .sidebar{width:100%;border-left:none;border-top:1px solid var(--border);max-height:50vh}
+  .video-stage video{max-height:30vh}
+  .topbar-watch{display:none}
+  .radio-grid{grid-template-columns:1fr 1fr}
+}
+
+/* ── VIDEO LOADING OVERLAY ── */
+.video-loading{position:absolute;inset:0;background:#1a1816;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10}
+.video-loading-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.video-loading-text{font-size:12px;color:#8a8280;font-family:'IBM Plex Mono',monospace}
+/* ── STYLE CARDS ── */
+.style-card{padding:16px 14px;border:1.5px solid var(--border);border-radius:var(--r2);background:var(--surface2);cursor:pointer;transition:all .13s;text-align:center}
+.style-card:hover{border-color:var(--border2)}.style-card.sel{border-color:var(--accent);background:var(--accent-l)}
+.style-card-code{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--ink4);margin-bottom:4px}
+.style-card-name{font-size:14px;font-weight:500;color:var(--ink)}.style-card-desc{font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.4}
+.style-card.sel .style-card-code,.style-card.sel .style-card-name{color:var(--accent)}
+/* ── CONFIDENCE CHIPS ── */
+.conf-chip{padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;color:var(--ink2);transition:all .13s}
+.conf-chip:hover{border-color:var(--border2);color:var(--ink)}.conf-chip.sel{border-color:var(--accent);background:var(--accent-l);color:var(--accent);font-weight:500}
+/* ── VOICE BTN RECORDING ── */
+#voice-btn.recording{border-color:var(--danger)!important;color:var(--danger)!important;background:var(--danger-l)!important}
+
+/* ── SINGLE COLUMN EXPERIMENT LAYOUT ── */
+.exp-wrap{min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
+.exp-topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;position:sticky;top:0;z-index:30}
+.exp-content{flex:1;display:flex;flex-direction:column;max-width:900px;width:100%;margin:0 auto;padding:0 0 60px}
+.video-wrap{background:#000;position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;flex-shrink:0}
+.video-wrap video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.video-loading2{position:absolute;inset:0;background:#1a1816;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10}
+.ctrl-row{background:var(--surface);border-top:1px solid var(--border);padding:0 16px;height:44px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.section-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);margin:10px 16px 0;padding:18px 20px}
+.section-block-title{font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.scrubber-row{padding:10px 16px 0}
+.scrubber-track2{height:5px;background:var(--bg3);border-radius:3px;position:relative;cursor:pointer;margin-top:4px}
+.scrubber-fill2{height:100%;background:var(--accent);border-radius:3px;pointer-events:none}
+.scrubber-thumb2{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.mark-track2{height:36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:visible;margin-top:8px}
+.emo-grid2{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-bottom:10px}
+.ann-list2{display:flex;flex-direction:column;gap:3px;max-height:120px;overflow-y:auto;margin-top:8px}
+/* questionnaire section - hidden until 20s watched */
+.quest-section{margin:10px 16px 0;display:none}
+.quest-section.visible{display:block}
+.quest-unlock-hint{text-align:center;padding:14px;font-size:12px;color:var(--ink3);font-family:'IBM Plex Mono',monospace;background:var(--surface);border:1px dashed var(--border);border-radius:var(--r3);margin:10px 16px 0}
+.quest-unlock-hint.hidden{display:none}
+/* practice task bar */
+.task-bar{background:var(--accent-l);border-bottom:1px solid rgba(45,90,61,.2);padding:7px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.task-bar-label{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--accent);letter-spacing:.06em;white-space:nowrap}
+
+/* ── VALENCE MARK BUTTONS ── */
+.mark-valence-btn{flex:1;padding:12px 10px;border-radius:var(--r2);border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:13px;font-weight:500;font-family:inherit;transition:all .13s;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink2)}
+.mark-valence-btn:hover{border-color:var(--border2);transform:translateY(-1px)}
+.mark-valence-btn.positive:hover,.mark-valence-btn.positive.flash{border-color:var(--accent);background:var(--accent-l);color:var(--accent)}
+.mark-valence-btn.negative:hover,.mark-valence-btn.negative.flash{border-color:var(--danger);background:var(--danger-l);color:var(--danger)}
+.mark-valence-btn.flash{transform:scale(1.04)}
+.mark-key-hint{font-size:9px;font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--ink4);background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:1px 6px}
+/* ── TAG ANNOTATION BUTTONS ── */
+.tag-btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.tag-btn{padding:11px 10px;border-radius:var(--r2);border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:12px;font-weight:500;font-family:inherit;transition:all .15s;text-align:center;color:var(--ink2);line-height:1.3}
+.tag-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.tag-btn.flash{transform:scale(1.04)}
+.tag-key{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.04em;background:rgba(0,0,0,.07);border:1px solid rgba(0,0,0,.12);border-radius:3px;padding:1px 5px;margin-right:6px;color:inherit;opacity:.7}
+.tag-like{border-color:rgba(45,90,61,.3);color:var(--accent)}
+.tag-like:hover,.tag-like.flash{background:var(--accent-l);border-color:var(--accent)}
+.tag-dislike{border-color:rgba(139,32,32,.25);color:var(--danger)}
+.tag-dislike:hover,.tag-dislike.flash{background:var(--danger-l);border-color:var(--danger)}
+.tag-good{border-color:rgba(29,106,159,.3);color:var(--expert)}
+.tag-good:hover,.tag-good.flash{background:var(--expert-l);border-color:var(--expert)}
+.tag-bad{border-color:rgba(122,92,30,.3);color:var(--warn)}
+.tag-bad:hover,.tag-bad.flash{background:var(--warn-l);border-color:var(--warn)}
+
+/* ── FIELD ERROR ── */
+.field-error{outline:2px solid var(--danger)!important;outline-offset:2px;border-radius:var(--r2)}
+.field-error textarea,.field-error input{border-color:var(--danger)!important}
+textarea.field-error{outline:2px solid var(--danger)!important}
+/* ── SCALE GROUP DIVIDER ── */
+.scale-group-wrap{border-top:1px solid var(--border);margin-top:14px;padding-top:12px}
+.scale-group-wrap:first-child{border-top:none;margin-top:0;padding-top:0}
+.scale-group-label{font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;padding-bottom:6px;display:flex;align-items:center;gap:8px}
+.scale-group-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.likert-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.likert-anchor{font-size:11px;color:var(--ink3);white-space:nowrap;min-width:60px}
+.likert-anchor.right{text-align:right}
+.likert-btns{display:flex;gap:4px;flex:1;justify-content:center}
+.likert-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:12px;font-weight:600;font-family:'IBM Plex Mono',monospace;color:var(--ink3);transition:all .13s;display:flex;align-items:center;justify-content:center}
+.likert-btn:hover{border-color:var(--border2);color:var(--ink);transform:scale(1.1)}
+.likert-btn.sel{border-color:var(--accent);background:var(--accent);color:#fff}
+.likert-row[data-max="5"] .likert-btn{width:38px;height:38px}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════
+     SCREEN 1 — CONSENT
+════════════════════════════════ -->
+<div class="screen active" id="screen-consent">
+<div class="onboard-wrap">
+<div class="onboard-bg"></div>
+<div class="onboard-logo"><span class="onboard-logo-a">Arch</span><span class="onboard-logo-b">Sense</span></div>
+<div class="card">
+  <div class="step-bar">
+    <div class="step-dot current">1</div><div class="step-line"></div>
+    <div class="step-dot todo">2</div><div class="step-line"></div>
+    <div class="step-dot todo">3</div><div class="step-line"></div>
+    <div class="step-dot todo">4</div><div class="step-line"></div>
+    <div class="step-dot todo">5</div><div class="step-line"></div>
+    <div class="step-dot todo">✓</div>
+  </div>
+  <div class="step-labels">
+    <div class="step-lbl current">同意書</div>
+    <div class="step-lbl">背景</div>
+    <div class="step-lbl">說明</div>
+    <div class="step-lbl">練習</div>
+    <div class="step-lbl">實驗</div>
+    <div class="step-lbl">完成</div>
+  </div>
+  <div class="card-title">研究參與知情同意書</div>
+  <div class="card-sub">INFORMED CONSENT FORM — IRB APPROVED</div>
+  <div class="consent-body" id="consent-scroll">
+    <h3>研究目的</h3>
+    <p>本研究旨在探討人們對不同建築空間的體驗與情緒反應。研究成果將用於改善建築設計與空間規劃。本研究已通過機構倫理審查委員會（IRB）審核。</p>
+    <h3>研究程序</h3>
+    <p>您將觀看一段建築空間影片（約 2–5 分鐘），並在觀看過程中標記您的空間感受與情緒印象。整個過程（含教學）預計 15–25 分鐘。</p>
+    <h3>匿名與資料保護</h3>
+    <ul>
+      <li>您的<strong>姓名不會被收集</strong>。系統將自動分配匿名代號識別您的資料。</li>
+      <li>您提供的電子郵件<strong>僅用於發放受試費用</strong>，不與實驗資料連結，費用發放後刪除。</li>
+      <li>人口背景資料（性別、年齡）以匯總方式呈現，無法辨識個人身份。</li>
+      <li>資料儲存於加密伺服器，僅研究團隊可存取，研究結束後五年內銷毀。</li>
+    </ul>
+    <h3>自願參與與退出權</h3>
+    <p>您的參與完全出於自願，可在任何時間無需說明理由退出，不會有任何不利後果。提交前退出則資料不被記錄。</p>
+    <h3>風險與利益</h3>
+    <p>本研究不涉及任何身體或心理風險。影片內容不含暴力或令人不適畫面。完成後您將獲得新台幣 <strong>_____ 元</strong>受試費。</p>
+    <h3>聯絡方式</h3>
+    <p>計畫主持人：<strong>kuopc@cs.nthu.edu.tw</strong><br>
+    實驗聯繫人：<strong id="contact-pi">yangchenlin@gapp.nthu.edu.tw</strong><br>
+    計畫信箱：<strong>projectana.nthu.hmilab.tw@gmail.com</strong></p>
+  </div>
+  <div class="scroll-hint" id="scroll-hint">↓ 請向下捲動閱讀完整同意書</div>
+  <div class="email-wrap">
+    <label class="email-lbl" for="p-email">電子郵件</label>
+    <input class="email-input" id="p-email" type="email" placeholder="your@email.com" oninput="checkConsent()">
+  </div>
+  <div class="email-note">僅用於領取受試費用，不與實驗資料連結</div>
+  <div style="margin-top:14px">
+    <div class="check-row" id="chk1" onclick="toggleCheck('chk1')">
+      <div class="check-box"><span class="check-tick">✓</span></div>
+      <div class="check-text">我已閱讀並理解上述知情同意書的全部內容</div>
+    </div>
+    <div class="check-row" id="chk2" onclick="toggleCheck('chk2')">
+      <div class="check-box"><span class="check-tick">✓</span></div>
+      <div class="check-text">我自願參與本研究，並了解可隨時退出</div>
+    </div>
+    <div class="check-row" id="chk3" onclick="toggleCheck('chk3')">
+      <div class="check-box"><span class="check-tick">✓</span></div>
+      <div class="check-text">我同意研究團隊依上述方式使用我的匿名資料</div>
+    </div>
+  </div>
+  <div class="warn-box" style="margin-top:14px">
+    ⚠ 本系統不儲存您的電子郵件。請在完成頁記錄完成碼後，自行寄信申請受試費。
+  </div>
+  <div class="field-group" style="margin-top:18px">
+    <label class="field-label">受試者代碼 <span style="color:var(--danger)">*</span></label>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">請輸入研究團隊寄給您的受試者代碼（格式：AS-XXXX）</div>
+    <input id="p-pcode" type="text" placeholder="AS-XXXX" maxlength="10"
+      style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r2);font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.1em;background:var(--surface2);color:var(--ink);text-transform:uppercase"
+      oninput="this.value=this.value.toUpperCase();checkConsent()">
+    <div id="pcode-err" style="font-size:11px;color:var(--danger);margin-top:5px;display:none"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="consent-btn" onclick="goTo('background')" disabled>同意並繼續 →</button>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN 2 — BACKGROUND
+════════════════════════════════ -->
+<div class="screen" id="screen-background">
+<div class="onboard-wrap">
+<div class="onboard-bg"></div>
+<div class="onboard-logo"><span class="onboard-logo-a">Arch</span><span class="onboard-logo-b">Sense</span></div>
+<div class="card">
+  <div class="step-bar">
+    <div class="step-dot done">✓</div><div class="step-line done"></div>
+    <div class="step-dot current">2</div><div class="step-line"></div>
+    <div class="step-dot todo">3</div><div class="step-line"></div>
+    <div class="step-dot todo">4</div><div class="step-line"></div>
+    <div class="step-dot todo">5</div><div class="step-line"></div>
+    <div class="step-dot todo">✓</div>
+  </div>
+  <div class="step-labels">
+    <div class="step-lbl done">同意書</div><div class="step-lbl current">背景</div>
+    <div class="step-lbl">說明</div><div class="step-lbl">練習</div>
+    <div class="step-lbl">實驗</div><div class="step-lbl">完成</div>
+  </div>
+  <div class="card-title">基本背景資料</div>
+  <div class="card-sub">PARTICIPANT BACKGROUND · 全程匿名</div>
+  <div class="field-group">
+    <label class="field-label">性別</label>
+    <div class="radio-grid c3" id="gender-grid">
+      <div class="radio-card" onclick="selRadio('gender','男性',this)">男性</div>
+      <div class="radio-card" onclick="selRadio('gender','女性',this)">女性</div>
+      <div class="radio-card" onclick="selRadio('gender','非二元',this)">非二元</div>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">年齡</label>
+    <div style="display:flex;align-items:center;gap:10px">
+      <input type="number" id="age-input" min="16" max="99" placeholder="請輸入年齡"
+        style="width:140px;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:15px;font-family:'IBM Plex Mono',monospace;background:var(--surface2);color:var(--ink)"
+        oninput="onAgeInput()">
+      <span style="font-size:13px;color:var(--ink3)">歲</span>
+    </div>
+    <div id="age-err" style="font-size:11px;color:var(--danger);margin-top:5px;display:none">請輸入有效年齡（16–99）</div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">您是否有建築、室內設計或相關領域的學習／工作背景？</label>
+    <div class="yesno-row">
+      <div class="yn-btn yes" id="arch-yes" onclick="selYN(true)">✓ 是</div>
+      <div class="yn-btn no"  id="arch-no"  onclick="selYN(false)">✗ 否</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo('consent')">← 返回</button>
+    <button class="btn btn-primary" id="bg-btn" onclick="confirmBackground()" disabled>繼續 →</button>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN 3 — PID + TUTORIAL
+════════════════════════════════ -->
+<div class="screen" id="screen-tutorial">
+<div class="onboard-wrap">
+<div class="onboard-bg"></div>
+<div class="onboard-logo"><span class="onboard-logo-a">Arch</span><span class="onboard-logo-b">Sense</span></div>
+<div class="card">
+  <div class="step-bar">
+    <div class="step-dot done">✓</div><div class="step-line done"></div>
+    <div class="step-dot done">✓</div><div class="step-line done"></div>
+    <div class="step-dot current">3</div><div class="step-line"></div>
+    <div class="step-dot todo">4</div><div class="step-line"></div>
+    <div class="step-dot todo">5</div><div class="step-line"></div>
+    <div class="step-dot todo">✓</div>
+  </div>
+  <div class="step-labels">
+    <div class="step-lbl done">同意書</div><div class="step-lbl done">背景</div>
+    <div class="step-lbl current">說明</div><div class="step-lbl">練習</div>
+    <div class="step-lbl">實驗</div><div class="step-lbl">完成</div>
+  </div>
+
+  <!-- PID reveal -->
+  <div class="card-title">您的參與代號</div>
+  <div class="card-sub">PARTICIPANT ID · 系統自動分配，請記下以備查詢</div>
+  <div class="pid-reveal">
+    <div class="pid-label">YOUR PARTICIPANT ID</div>
+    <div class="pid-code" id="pid-display">P–????</div>
+    <div class="pid-note">此代號已儲存於您的實驗資料中<br>完成後可憑完成碼（非此代號）申請受試費</div>
+  </div>
+
+  <div style="border-top:1px solid var(--border);padding-top:24px;margin-top:4px">
+    <div class="card-title" style="font-size:16px;margin-bottom:4px">系統操作說明</div>
+    <div class="card-sub">請閱讀後進行練習，熟悉操作才能開始正式實驗</div>
+
+    <div class="tutorial-grid">
+      <div class="tut-card">
+        <div class="tut-icon-wrap green" style="font-size:18px">🎬</div>
+        <div class="tut-body">
+          <div class="tut-title">播放與即時標注</div>
+          <div class="tut-desc">觀看影片時，用畫面下方的<strong>四個按鈕</strong>記錄當下感受：<br>
+          <strong style="color:var(--accent)">Q</strong> 喜歡這邊的設計 ／ <strong style="color:var(--danger)">E</strong> 不喜歡<br>
+          <strong style="color:var(--expert)">Z</strong> 這邊設計的好 ／ <strong style="color:var(--warn)">C</strong> 設計的不好<br>
+          也可直接用鍵盤按 Q / E / Z / C 快速標記。</div>
+          <span class="tut-hint">💡 Space 鍵 = 播放／暫停</span>
+        </div>
+      </div>
+      <div class="tut-card">
+        <div class="tut-icon-wrap brown" style="font-size:18px">📊</div>
+        <div class="tut-body">
+          <div class="tut-title">看完後填寫問卷</div>
+          <div class="tut-desc">觀看滿 20 秒後，問卷區塊自動解鎖，包含三個部分：<br>
+          ① <strong>風格判斷</strong>：猜測空間風格 + 信心程度<br>
+          ② <strong>空間描述</strong>：用文字描述感受（至少 20 字）<br>
+          ③ <strong>量表評分</strong>：對各維度點選評分後按「儲存」</div>
+          <span class="tut-hint">💡 量表填完記得按「儲存量表評分」</span>
+        </div>
+      </div>
+      <div class="tut-card">
+        <div class="tut-icon-wrap blue" style="font-size:18px">⏱</div>
+        <div class="tut-body">
+          <div class="tut-title">觀看時長要求</div>
+          <div class="tut-desc">頂部進度條顯示累積觀看時間，需達到 <strong>20 秒</strong>才能提交問卷。累積觀看，不需連續。進度條變綠色即達標。</div>
+          <span class="tut-hint">💡 8 部影片，每部各自計時</span>
+        </div>
+      </div>
+      <div class="tut-card">
+        <div class="tut-icon-wrap green" style="font-size:18px">💾</div>
+        <div class="tut-body">
+          <div class="tut-title">資料自動儲存</div>
+          <div class="tut-desc">每部影片提交後資料即時備份。若意外重整頁面，系統會<strong>自動恢復進度</strong>，跳回最後一部未完成的影片，已完成的不需重做。</div>
+          <span class="tut-hint">💡 完成後請記下完成碼申請受試費</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo('background')">← 返回</button>
+    <button class="btn btn-primary" onclick="goTo('practice');loadPracticeVideo()">開始練習 →</button>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- SCREEN 4 — PRACTICE -->
+<div class="screen" id="screen-practice">
+<div class="exp-wrap">
+  <!-- topbar -->
+  <div class="exp-topbar">
+    <div class="topbar-brand"><span class="topbar-brand-a">Arch</span><span class="topbar-brand-b">Sense</span></div>
+    <div class="topbar-div"></div>
+    <div class="practice-badge">練習模式</div>
+    <div class="topbar-watch">
+      <div class="watch-dot" id="prac-watch-dot"></div>
+      <span class="watch-label" id="prac-watch-label">0s / 20s</span>
+      <div class="watch-bar-wrap"><div class="watch-bar-fill" id="prac-watch-bar"></div></div>
+    </div>
+    <div style="margin-left:auto">
+      <button class="btn-sm btn-sm-primary" id="practice-next-btn" onclick="finishPractice()" disabled>完成練習，開始實驗 →</button>
+    </div>
+  </div>
+  <!-- task bar -->
+  <div class="task-bar">
+    <span class="task-bar-label">完成任務：</span>
+    <div id="task-pills-wrap" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+  </div>
+  <!-- content -->
+  <div class="exp-content">
+    <!-- video -->
+    <div class="video-wrap" id="prac-video-wrap">
+      <video id="prac-video" preload="auto"></video>
+      <div class="vid-wait-overlay" id="prac-loading">
+        <div class="vid-spinner"></div>
+        <div class="vid-wait-title">載入練習影片中，請稍候…</div>
+        <div class="vid-buffer-bar"><div class="vid-buffer-fill" id="prac-buf-fill"></div></div>
+        <div class="vid-wait-sub" id="prac-wait-sub">正在連線至伺服器</div>
+      </div>
+    </div>
+    <!-- controls -->
+    <div class="ctrl-row">
+      <button class="ctrl-icon-btn" id="prac-play-btn" onclick="togglePracPlay()"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg></button>
+      <button class="ctrl-icon-btn" onclick="skipPrac(-5)"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg></button>
+      <button class="ctrl-icon-btn" onclick="skipPrac(5)"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg></button>
+      <span class="ctrl-time" id="prac-time">0:00 / 0:00</span>
+    </div>
+    <!-- scrubber -->
+    <div class="scrubber-row">
+      <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink4)"><span>0:00</span><span id="prac-dur">—</span></div>
+      <div class="scrubber-track2" id="prac-scrubber" onclick="pracScrubClick(event)">
+        <div class="scrubber-fill2" id="prac-fill" style="width:0%"></div>
+        <div class="scrubber-thumb2" id="prac-thumb" style="left:0%"></div>
+      </div>
+      <div class="mark-track2" id="prac-ann-track"><div class="mark-track-label label-xs">MARKS</div></div>
+    </div>
+    <!-- annotation -->
+    <div class="section-block">
+      <div class="section-block-title">即時標注 <span style="color:var(--ink4);font-size:9px;font-weight:400">Space = 播放／暫停　Q / E / Z / C = 標注</span></div>
+      <div class="tag-btn-grid" style="margin-bottom:8px">
+        <button class="tag-btn tag-like"    onclick="pracMarkTag('like_design')"    id="prac-btn-like"><span class="tag-key">Q</span>👍 喜歡這邊的設計</button>
+        <button class="tag-btn tag-dislike" onclick="pracMarkTag('dislike_design')" id="prac-btn-dislike"><span class="tag-key">E</span>👎 不喜歡這邊的設計</button>
+        <button class="tag-btn tag-good"    onclick="pracMarkTag('design_good')"    id="prac-btn-good"><span class="tag-key">Z</span>✅ 這邊設計的好</button>
+        <button class="tag-btn tag-bad"     onclick="pracMarkTag('design_bad')"     id="prac-btn-bad"><span class="tag-key">C</span>❌ 這邊設計的不好</button>
+      </div>
+      <div class="ann-list2" id="prac-ann-list"></div>
+    </div>
+    <!-- practice guide panel -->
+    <div class="prac-guide" id="prac-guide-panel">
+      <div class="prac-guide-header">
+        <span style="font-size:16px">🧭</span>
+        <div class="prac-guide-title">練習步驟導覽</div>
+        <span id="prac-guide-progress" style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent)">0 / 4</span>
+      </div>
+      <div class="prac-guide-steps" id="prac-guide-steps">
+        <div class="prac-step-row active-step" id="pstep-0">
+          <div class="prac-step-num active" id="pstep-num-0">1</div>
+          <div class="prac-step-body">
+            <div class="prac-step-title">播放練習影片</div>
+            <div class="prac-step-desc">按下影片下方的 ▶ 播放鍵，或按鍵盤 <strong>Space</strong> 開始播放。影片是一段約 80 秒的建築空間漫遊。
+              <div class="prac-step-anim"><span class="prac-key-demo" id="pkd-space">Space</span></div>
+            </div>
+            <span class="prac-step-tip">💡 影片播放後即開始計算觀看時間</span>
+          </div>
+        </div>
+        <div class="prac-step-row" id="pstep-1">
+          <div class="prac-step-num pending" id="pstep-num-1">2</div>
+          <div class="prac-step-body">
+            <div class="prac-step-title">即時標注感受</div>
+            <div class="prac-step-desc">觀看時，按下四個按鈕之一記錄當下反應。建議多標記幾次，捕捉不同時間點的感受。
+              <div class="prac-step-anim"><span class="prac-key-demo" id="pkd-q">Q</span><span class="prac-key-demo" id="pkd-e">E</span><span class="prac-key-demo" id="pkd-z">Z</span><span class="prac-key-demo" id="pkd-c">C</span></div>
+            </div>
+            <span class="prac-step-tip">💡 反應直覺就好，不需要想太多</span>
+          </div>
+        </div>
+        <div class="prac-step-row" id="pstep-2">
+          <div class="prac-step-num pending" id="pstep-num-2">3</div>
+          <div class="prac-step-body">
+            <div class="prac-step-title">觀看滿 20 秒，解鎖問卷</div>
+            <div class="prac-step-desc">頂部進度條顯示累積觀看秒數，達到 20 秒後問卷區塊自動解鎖。可以快轉，但需要實際觀看到。</div>
+            <span class="prac-step-tip green">✓ 達標後問卷會出現在下方</span>
+          </div>
+        </div>
+        <div class="prac-step-row" id="pstep-3">
+          <div class="prac-step-num pending" id="pstep-num-3">4</div>
+          <div class="prac-step-body">
+            <div class="prac-step-title">完成問卷</div>
+            <div class="prac-step-desc">填寫風格判斷、信心程度、空間描述（至少 20 字），以及所有量表評分後按「儲存量表」。全部完成即可進入正式實驗。</div>
+            <span class="prac-step-tip">💡 正式實驗流程完全相同</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- hint before 20s -->
+    <div class="quest-unlock-hint" id="prac-unlock-hint">觀看滿 20 秒後解鎖問卷 ↓</div>
+    <!-- questionnaire (unlocks after 20s) -->
+    <div class="quest-section" id="prac-quest-section">
+      <!-- style guess -->
+      <div class="section-block" style="margin-top:0;margin-bottom:10px">
+        <div class="section-block-title">🏛 風格判斷（練習）</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div class="style-card" onclick="selPracStyle('MODN',this)"><div class="style-card-code">MODN</div><div class="style-card-name">現代簡約</div></div>
+          <div class="style-card" onclick="selPracStyle('MUJI',this)"><div class="style-card-code">MUJI</div><div class="style-card-name">無印自然</div></div>
+          <div class="style-card" onclick="selPracStyle('SCAN',this)"><div class="style-card-code">SCAN</div><div class="style-card-name">北歐風格</div></div>
+          <div class="style-card" onclick="selPracStyle('WABI',this)"><div class="style-card-code">WABI</div><div class="style-card-name">侘寂美學</div></div>
+        </div>
+        <div class="label-xs" style="margin-bottom:8px">信心程度</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="prac-conf-row">
+          <div class="conf-chip" onclick="selPracConf(1,this)">1 不確定</div>
+          <div class="conf-chip" onclick="selPracConf(2,this)">2</div>
+          <div class="conf-chip" onclick="selPracConf(3,this)">3</div>
+          <div class="conf-chip" onclick="selPracConf(4,this)">4</div>
+          <div class="conf-chip" onclick="selPracConf(5,this)">5 確定</div>
+        </div>
+      </div>
+      <!-- description -->
+      <div class="section-block" style="margin-top:0;margin-bottom:10px">
+        <div class="section-block-title">✏ 空間描述（練習）</div>
+        <textarea class="desc-ta" id="prac-desc-ta" placeholder="請描述這個空間的氛圍、感受...（至少20字）" oninput="onPracDescInput()" style="width:100%;min-height:80px"></textarea>
+        <div style="text-align:right;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--ink4);margin-top:4px" id="prac-desc-count">0 字</div>
+      </div>
+      <!-- scales -->
+      <div class="section-block" style="margin-top:0;margin-bottom:10px">
+        <div class="section-block-title">📊 量表評分（練習）</div>
+        <div id="prac-scale-items"></div>
+        <button class="export-btn" onclick="pracSaveScale()"><span>💾</span>儲存量表評分</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SCREEN 5 — EXPERIMENT -->
+<div class="screen" id="app-screen">
+<div class="exp-wrap">
+  <!-- topbar -->
+  <div class="exp-topbar">
+    <div class="topbar-brand"><span class="topbar-brand-a">Arch</span><span class="topbar-brand-b">Sense</span></div>
+    <div class="topbar-div"></div>
+    <div class="topbar-pid mono" id="topbar-pid">—</div>
+    <div class="topbar-watch">
+      <div class="watch-dot" id="watch-dot"></div>
+      <span class="watch-label" id="watch-label">0s / 20s</span>
+      <div class="watch-bar-wrap"><div class="watch-bar-fill" id="watch-bar"></div></div>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink3)" id="topbar-video-info">影片 1 / 8</span>
+      <button class="btn-sm btn-sm-primary" id="next-video-btn" onclick="goToPostVideo()" disabled>完成此部，填寫問卷 →</button>
+    </div>
+  </div>
+  <!-- content -->
+  <div class="exp-content">
+    <!-- video -->
+    <div class="video-wrap" id="video-stage">
+      <video id="main-video"></video>
+      <canvas id="annotation-canvas"></canvas>
+      <div class="vid-wait-overlay" id="video-loading">
+        <div class="vid-spinner"></div>
+        <div class="vid-wait-title" id="video-loading-text">載入影片中，請稍候…</div>
+        <div class="vid-buffer-bar"><div class="vid-buffer-fill" id="main-buf-fill"></div></div>
+        <div class="vid-wait-sub" id="main-wait-sub">正在連線至伺服器</div>
+      </div>
+    </div>
+    <!-- controls -->
+    <div class="ctrl-row">
+      <button class="ctrl-icon-btn" id="play-btn" onclick="togglePlay()"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg></button>
+      <button class="ctrl-icon-btn" onclick="skipTime(-5)"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg></button>
+      <button class="ctrl-icon-btn" onclick="skipTime(5)"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg></button>
+      <span class="ctrl-time" id="ctrl-time">0:00 / 0:00</span>
+    </div>
+    <!-- scrubber -->
+    <div class="scrubber-row">
+      <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink4)"><span>0:00</span><span id="dur-label">—</span></div>
+      <div class="scrubber-track2" id="scrubber-track" onclick="scrubberClick(event)">
+        <div class="scrubber-watched" id="watched-segs"></div>
+        <div class="scrubber-fill2" id="scrubber-fill" style="width:0%"></div>
+        <div class="scrubber-thumb2" id="scrubber-thumb" style="left:0%"></div>
+      </div>
+      <div class="mark-track2" id="ann-track"><div class="mark-track-label label-xs">MARKS</div></div>
+    </div>
+    <!-- annotation -->
+    <div class="section-block">
+      <div class="section-block-title">即時標注 <span style="color:var(--ink4);font-size:9px;font-weight:400">Space = 播放／暫停　Q / E / Z / C = 標注</span></div>
+      <div class="tag-btn-grid" style="margin-bottom:8px">
+        <button class="tag-btn tag-like"    onclick="markTag('like_design')"    id="main-btn-like"><span class="tag-key">Q</span>👍 喜歡這邊的設計</button>
+        <button class="tag-btn tag-dislike" onclick="markTag('dislike_design')" id="main-btn-dislike"><span class="tag-key">E</span>👎 不喜歡這邊的設計</button>
+        <button class="tag-btn tag-good"    onclick="markTag('design_good')"    id="main-btn-good"><span class="tag-key">Z</span>✅ 這邊設計的好</button>
+        <button class="tag-btn tag-bad"     onclick="markTag('design_bad')"     id="main-btn-bad"><span class="tag-key">C</span>❌ 這邊設計的不好</button>
+      </div>
+      <div class="ann-list2" id="ann-list"></div>
+    </div>
+    <!-- unlock hint -->
+    <div class="quest-unlock-hint" id="quest-unlock-hint">觀看滿 20 秒後解鎖問卷 ↓</div>
+    <!-- questionnaire -->
+    <div class="quest-section" id="quest-section">
+      <!-- style guess -->
+      <div class="section-block" style="margin-top:0;margin-bottom:10px">
+        <div class="section-block-title">🏛 風格判斷</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div class="style-card" onclick="selStyle('MODN',this)"><div class="style-card-code">MODN</div><div class="style-card-name">現代簡約</div><div class="style-card-desc">俐落線條、中性色調</div></div>
+          <div class="style-card" onclick="selStyle('MUJI',this)"><div class="style-card-code">MUJI</div><div class="style-card-name">無印自然</div><div class="style-card-desc">木質調、米白色</div></div>
+          <div class="style-card" onclick="selStyle('SCAN',this)"><div class="style-card-code">SCAN</div><div class="style-card-name">北歐風格</div><div class="style-card-desc">明亮採光、幾何元素</div></div>
+          <div class="style-card" onclick="selStyle('WABI',this)"><div class="style-card-code">WABI</div><div class="style-card-name">侘寂美學</div><div class="style-card-desc">不完美感、自然風化</div></div>
+        </div>
+        <div class="label-xs" style="margin-bottom:8px">信心程度</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="conf-row">
+          <div class="conf-chip" onclick="selConf(1,this)">1 不確定</div>
+          <div class="conf-chip" onclick="selConf(2,this)">2</div>
+          <div class="conf-chip" onclick="selConf(3,this)">3</div>
+          <div class="conf-chip" onclick="selConf(4,this)">4</div>
+          <div class="conf-chip" onclick="selConf(5,this)">5 確定</div>
+        </div>
+      </div>
+      <!-- description -->
+      <div class="section-block" style="margin-top:0;margin-bottom:10px">
+        <div class="section-block-title">✏ 空間描述</div>
+        <div style="position:relative">
+          <textarea id="desc-ta" class="desc-ta" style="width:100%;min-height:88px" placeholder="請描述這個空間的氛圍、光線、材質、或給您的感受...（至少20字）" oninput="onDescInput()"></textarea>
+          <span id="desc-count" style="position:absolute;bottom:10px;right:12px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--ink4)">0 字</span>
+        </div>
+        <button id="voice-btn" onclick="toggleVoice()" style="margin-top:8px;display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:var(--r2);border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:12px;color:var(--ink2);font-family:inherit">🎙 語音輸入（可選）</button>
+        <div id="voice-status" style="font-size:11px;color:var(--ink3);font-family:'IBM Plex Mono',monospace;margin-top:6px;min-height:16px"></div>
+      </div>
+      <!-- scales -->
+      <div class="section-block" style="margin-top:0;margin-bottom:10px">
+        <div class="section-block-title">📊 量表評分</div>
+        <div id="post-scale-container"></div>
+      </div>
+      <!-- submit -->
+      <div style="padding:0 16px 20px;display:flex;justify-content:flex-end">
+        <button class="btn btn-primary" id="next-video-btn2" onclick="validateAndSubmit()">儲存並繼續下一部 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN 6 — COMPLETE
+════════════════════════════════ -->
+<div class="screen" id="screen-complete">
+<div class="onboard-wrap">
+<div class="onboard-bg"></div>
+<div class="onboard-logo"><span class="onboard-logo-a">Arch</span><span class="onboard-logo-b">Sense</span></div>
+<div class="card">
+  <div class="step-bar">
+    <div class="step-dot done">✓</div><div class="step-line done"></div>
+    <div class="step-dot done">✓</div><div class="step-line done"></div>
+    <div class="step-dot done">✓</div><div class="step-line done"></div>
+    <div class="step-dot done">✓</div><div class="step-line done"></div>
+    <div class="step-dot done">✓</div><div class="step-line done"></div>
+    <div class="step-dot done">✓</div>
+  </div>
+  <div class="step-labels">
+    <div class="step-lbl done">同意書</div><div class="step-lbl done">背景</div>
+    <div class="step-lbl done">說明</div><div class="step-lbl done">練習</div>
+    <div class="step-lbl done">實驗</div><div class="step-lbl done">完成</div>
+  </div>
+  <div class="card-title">🎉 感謝您的參與！</div>
+  <div class="card-sub" style="margin-bottom:12px">EXPERIMENT COMPLETE</div>
+  <p style="font-size:13px;color:var(--ink2);margin-bottom:4px">您的實驗完成碼：</p>
+  <div class="completion-code-box">
+    <div class="completion-code-label">COMPLETION CODE</div>
+    <div class="completion-code" id="completion-code">————</div>
+  </div>
+  <div class="completion-step">
+    <div class="completion-step-num">1</div>
+    <div class="completion-step-text"><strong>複製上方完成碼</strong>，開啟您的電子郵件</div>
+  </div>
+  <div class="completion-step">
+    <div class="completion-step-num">2</div>
+    <div class="completion-step-text">
+      寄信至 <span class="research-email" id="complete-email">projectana.nthu.hmilab.tw@gmail.com</span><br>
+      主旨：<strong>「ArchSense 受試費申請 — [完成碼]」</strong>
+    </div>
+  </div>
+  <div class="completion-step">
+    <div class="completion-step-num">3</div>
+    <div class="completion-step-text">研究團隊將於 <strong>5 個工作天內</strong>與您確認並安排發放</div>
+  </div>
+  <div id="submit-status" style="font-size:12px;color:var(--ink3);text-align:center;margin-bottom:8px;font-family:'IBM Plex Mono',monospace"></div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+    <button class="export-btn" onclick="copyCode()"><span>📋</span> 複製完成碼</button>
+    <button class="export-btn" onclick="downloadJSON()"><span>{ }</span> 下載實驗資料 JSON</button>
+  </div>
+  <p style="font-size:11px;color:var(--ink4);margin-top:18px;text-align:center;line-height:1.6">
+    如有任何問題請聯絡 <span style="color:var(--ink3)" id="complete-email2">projectana.nthu.hmilab.tw@gmail.com</span>
+  </p>
+</div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+/* ════ CONFIG ════ */
+const RESEARCH_EMAIL   = 'projectana.nthu.hmilab.tw@gmail.com';
+const RESEARCH_EMAIL_PI = 'kuopc@cs.nthu.edu.tw';
+const RESEARCH_EMAIL2  = 'yangchenlin@gapp.nthu.edu.tw';
+const SHEETS_URL       = 'https://script.google.com/macros/s/AKfycbw7ZZO3SU7A9rIuuIs4UJhmvmNf83CJMDVt1F9LGVICk9oWUBlRIAURjJwWksWPOT8c6Q/exec';
+const GAS_TOKEN        = 'as2025nthu';
+const R2_BASE          = 'https://pub-d1170515a6a547b0a0b191a7fe809b1e.r2.dev';
+const PRACTICE_VIDEO   = R2_BASE + '/EGVideo_SPACE_05_MODN.mp4';
+const WATCH_THRESHOLD_PCT = 0.65;
+
+/* ── DEV MODE ─────────────────────────────────────────────────────────────
+   切換 A（本地）：把 false 改 true
+   切換 B（不改碼）：網址加 ?dev=1
+   測試差異：影片數 8→3，觀看門檻 65%→10%，資料標記 DEV-
+   ──────────────────────────────────────────────────────────────────────── */
+const DEV_MODE = (new URLSearchParams(location.search).get('dev')==='1') || false;
+
+const VIDEOS_PER_SESS  = DEV_MODE ? 3 : 8;
+const STYLES           = ['MODN','MUJI','SCAN','WABI'];
+// MIN_WATCH_SEC 依影片實際長度動態計算，見 loadExperimentVideo
+const AVAILABLE_VIDEOS = [
+  'EGVideo_SPACE_05_MODN','EGVideo_SPACE_05_MUJI','EGVideo_SPACE_05_SCAN','EGVideo_SPACE_05_WABI',
+  'EGVideo_SPACE_06_MODN','EGVideo_SPACE_06_SCAN','EGVideo_SPACE_06_WABI',
+  'EGVideo_SPACE_07_MODN','EGVideo_SPACE_07_MUJI','EGVideo_SPACE_07_SCAN','EGVideo_SPACE_07_WABI',
+  'EGVideo_SPACE_08_MODN','EGVideo_SPACE_08_MUJI','EGVideo_SPACE_08_SCAN','EGVideo_SPACE_08_WABI',
+];
+const SCALES = [
+  {group:'光線感知',items:[
+    {key:'lightColor',  label:'內部光線色調', lo:'冷色調', hi:'暖色調',  max:7},
+    {key:'lightComfort',label:'光線舒適度',   lo:'不舒適', hi:'舒適',    max:5},
+  ]},
+  {group:'探索意願',items:[
+    {key:'exploreWant', label:'探索意願',     lo:'不想探索',hi:'想探索', max:7},
+    {key:'enterWant',   label:'進入意願',     lo:'不想進入',hi:'想進入', max:7},
+  ]},
+  {group:'情感感受',items:[
+    {key:'inspired',    label:'鼓舞感',  lo:'沮喪的',  hi:'鼓舞的',  max:7},
+    {key:'belonging',   label:'歸屬感',  lo:'無法融入',hi:'有歸屬感',max:7},
+    {key:'relaxed',     label:'放鬆感',  lo:'有壓力的',hi:'放鬆的',  max:7},
+    {key:'comfortable', label:'舒適感',  lo:'不舒適',  hi:'舒適',    max:7},
+    {key:'lively',      label:'活力感',  lo:'毫無生氣',hi:'有活力的',max:7},
+    {key:'interesting1',label:'有趣感',  lo:'無趣',    hi:'有趣',    max:7},
+    {key:'positive',    label:'正面感',  lo:'負面的',  hi:'正面的',  max:7},
+  ]},
+  {group:'空間評估',items:[
+    {key:'interesting2',label:'視覺趣味',lo:'無聊',   hi:'有趣',    max:7},
+    {key:'natural',     label:'自然感',  lo:'人造的', hi:'自然的',  max:7},
+    {key:'ordered',     label:'秩序感',  lo:'失序的', hi:'井然有序',max:7},
+    {key:'complex',     label:'複雜度',  lo:'簡單',   hi:'複雜',    max:7},
+  ]},
+];
+
+/* ════ VIDEO ASSIGNMENT ════ */
+function assignVideos(seed){
+  function sh(arr,s){const a=[...arr];let h=s;for(let i=a.length-1;i>0;i--){h=(Math.imul(h^(h>>>16),0x45d9f3b))>>>0;h=(Math.imul(h^(h>>>16),0x45d9f3b))>>>0;const j=h%(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+  const picked=[];const shuffled=sh(AVAILABLE_VIDEOS,seed);
+  STYLES.forEach(style=>{
+    shuffled.filter(v=>v.endsWith('_'+style)).slice(0,2).forEach(vid=>{
+      const sp=vid.match(/SPACE_(\d+)/)[1];
+      picked.push({videoId:vid,style,spaceNum:sp,url:R2_BASE+'/'+vid+'.mp4'});
+    });
+  });
+  return sh(picked,seed+1);
+}
+
+/* ════ STATE ════ */
+const P={email:'',pid:'',participantCode:'',gender:'',age:'',archBg:null,consentTime:null};
+const bgSel={gender:null,age:null,arch:null};
+let assignedVideos=[],currentVideoIdx=0;
+let sessionData={meta:{},videos:[]};
+const state={loaded:false,duration:80,minWatchSec:52,playing:false,watchedRanges:[],currentWatchStart:null,annotations:[],selectedEmo:null,drawAnnotations:[]};
+const postState={style:null,conf:null,descText:'',audioBlob:null};
+const pracState={loaded:false,duration:80,minWatchSec:52,playing:false,watchedRanges:[],currentWatchStart:null,annotations:[],selectedEmo:null,pracStyle:null,pracConf:null,pracDescOk:false,scalesSaved:false};
+
+/* ════ SESSION PERSISTENCE ════ */
+const SS_KEY='archsense_session_v1';
+function saveSession(){
+  if(!P.pid)return;
+  const snap={
+    P,bgSel,currentVideoIdx,
+    sessionData:JSON.parse(JSON.stringify(sessionData,function(k,v){return k==='audioBlob'?null:v;})),
+    screen:document.querySelector('.screen.active')?.id||'screen-consent'
+  };
+  try{sessionStorage.setItem(SS_KEY,JSON.stringify(snap));}catch(e){}
+}
+function clearSession(){try{sessionStorage.removeItem(SS_KEY);}catch(e){}}
+function restoreSession(){
+  let snap;
+  try{snap=JSON.parse(sessionStorage.getItem(SS_KEY)||'');}catch(e){return false;}
+  if(!snap||!snap.P||!snap.P.pid)return false;
+  // restore P
+  Object.assign(P,snap.P);
+  Object.assign(bgSel,snap.bgSel||{});
+  currentVideoIdx=snap.currentVideoIdx||0;
+  Object.assign(sessionData,snap.sessionData||{meta:{},videos:[]});
+  // restore assignedVideos from pid seed
+  const seed=P.pid.split('').reduce((s,c)=>s+c.charCodeAt(0),0);
+  assignedVideos=assignVideos(seed);
+  // go to right screen
+  const target=snap.screen||'screen-consent';
+  if(target==='app-screen'||target==='screen-practice'){
+    // go to experiment and reload current video
+    document.getElementById('topbar-pid').textContent=P.pid;
+    goTo('experiment');
+    loadExperimentVideo();
+    showToast('✓ 已自動恢復至影片 '+(currentVideoIdx+1),'success');
+  } else if(target==='screen-tutorial'||target==='screen-background'){
+    document.getElementById('pid-display').textContent=P.pid;
+    goTo('tutorial');
+  } else {
+    return false;
+  }
+  return true;
+}
+
+/* ════ SCREEN NAV ════ */
+function goTo(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const map={consent:'screen-consent',background:'screen-background',tutorial:'screen-tutorial',practice:'screen-practice',experiment:'app-screen',complete:'screen-complete'};
+  document.getElementById(map[name]).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ════ CONSENT ════ */
+const checks={chk1:false,chk2:false,chk3:false};
+document.getElementById('consent-scroll').addEventListener('scroll',function(){if(this.scrollTop>40)document.getElementById('scroll-hint').style.opacity='0';});
+function toggleCheck(id){checks[id]=!checks[id];document.getElementById(id).classList.toggle('checked',checks[id]);checkConsent();}
+function checkConsent(){
+  const email=document.getElementById('p-email').value.trim();
+  const pcode=document.getElementById('p-pcode').value.trim();
+  const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const pcodeOk=/^AS-[A-Z0-9]{4}$/i.test(pcode);
+  const ok=checks.chk1&&checks.chk2&&checks.chk3&&emailOk&&pcodeOk;
+  document.getElementById('consent-btn').disabled=!ok;
+}
+document.getElementById('consent-btn').onclick=()=>{
+  const pcode=document.getElementById('p-pcode').value.trim().toUpperCase();
+  // localStorage dedup check（白名單代碼跳過，供開發測試用）
+  const DEV_BYPASS_CODES=['AS-TEST','AS-DEV1','AS-DEV2'];
+  const done=JSON.parse(localStorage.getItem('as_done_codes')||'[]');
+  if(!DEV_BYPASS_CODES.includes(pcode)&&done.includes(pcode)){
+    document.getElementById('pcode-err').textContent='此代碼已完成過實驗，每個代碼只能使用一次。如有疑問請聯絡研究團隊。';
+    document.getElementById('pcode-err').style.display='block';
+    return;
+  }
+  P.email=document.getElementById('p-email').value.trim();
+  P.participantCode=pcode;
+  P.consentTime=new Date().toISOString();
+  goTo('background');
+};
+
+/* ════ BACKGROUND ════ */
+function selRadio(grp,val,el){const g=document.getElementById(grp+'-grid');if(g)g.querySelectorAll('.radio-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');bgSel[grp]=val;checkBg();}
+function selYN(val){bgSel.arch=val;document.getElementById('arch-yes').classList.toggle('sel',val===true);document.getElementById('arch-no').classList.toggle('sel',val===false);checkBg();}
+function onAgeInput(){
+  const v=parseInt(document.getElementById('age-input').value);
+  const err=document.getElementById('age-err');
+  if(v>=16&&v<=99){bgSel.age=v;err.style.display='none';}
+  else{bgSel.age=null;if(document.getElementById('age-input').value)err.style.display='block';else err.style.display='none';}
+  checkBg();
+}
+function checkBg(){document.getElementById('bg-btn').disabled=!(bgSel.gender&&bgSel.age&&bgSel.arch!==null);}
+function confirmBackground(){P.gender=bgSel.gender;P.age=bgSel.age;P.archBg=bgSel.arch;P.pid=generatePID();document.getElementById('pid-display').textContent=P.pid;goTo('tutorial');}
+function generatePID(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let r='P-';for(let i=0;i<4;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
+
+/* ════ PRACTICE ════ */
+const pracTasks={playVideo:{label:'播放影片',done:false},selectEmo:{label:'選擇情緒',done:false},markOnce:{label:'標記一次',done:false},fillQuest:{label:'完成問卷',done:false}};
+function markPracTask(key){if(pracTasks[key].done)return;pracTasks[key].done=true;renderTaskPills();checkPracDone();}
+function checkPracDone(){const allDone=Object.values(pracTasks).every(t=>t.done);document.getElementById('practice-next-btn').disabled=!allDone;if(allDone)showToast('✓ 所有練習任務完成！','success');}
+function renderTaskPills(){const wrap=document.getElementById('task-pills-wrap');wrap.innerHTML='';Object.values(pracTasks).forEach(t=>{const el=document.createElement('div');el.className='task-pill'+(t.done?' done':'');el.innerHTML='<div class="task-pill-dot"></div>'+t.label;wrap.appendChild(el);});}
+
+const pracVideo=document.getElementById('prac-video');
+function loadPracticeVideo(){
+  pracVideo.src=PRACTICE_VIDEO;
+  const loadEl=document.getElementById('prac-loading');
+  loadEl.style.display='flex';
+  document.getElementById('prac-play-btn').disabled=true;
+  pracVideo.addEventListener('progress',function(){
+    if(!pracVideo.duration)return;
+    var pct=0;
+    if(pracVideo.buffered.length>0)pct=Math.min(100,Math.round(pracVideo.buffered.end(pracVideo.buffered.length-1)/pracVideo.duration*100));
+    document.getElementById('prac-buf-fill').style.width=pct+'%';
+    document.getElementById('prac-wait-sub').textContent='緩衝中… '+pct+'%';
+  });
+  pracVideo.addEventListener('loadedmetadata',()=>{
+    loadEl.style.display='none';
+    pracState.duration=pracVideo.duration;
+    const pct=DEV_MODE?0.10:WATCH_THRESHOLD_PCT;
+    pracState.minWatchSec=Math.round(pracVideo.duration*pct);
+    document.getElementById('prac-dur').textContent=fmtTime(pracVideo.duration);
+    pracState.loaded=true;
+    document.getElementById('prac-play-btn').disabled=false;
+    setTimeout(()=>animGuideKey('pkd-space'),600);
+  },{once:true});
+  pracVideo.addEventListener('error',()=>{
+    const el=document.getElementById('prac-wait-sub');
+    if(el)el.textContent='⚠ 影片載入失敗，請聯繫研究人員';
+  },{once:true});
+  pracVideo.addEventListener('play',()=>{pracState.playing=true;pracState.currentWatchStart=pracVideo.currentTime;markPracTask('playVideo');updatePracPlayBtn();document.getElementById('prac-watch-dot').classList.add('live');});
+  pracVideo.addEventListener('pause',()=>{pracState.playing=false;updatePracPlayBtn();document.getElementById('prac-watch-dot').classList.remove('live');recordPracWatched();updatePracWatchWidget();});
+  pracVideo.addEventListener('timeupdate',()=>{
+    const t=pracVideo.currentTime,d=pracState.duration||80,p=d?(t/d)*100:0;
+    document.getElementById('prac-fill').style.width=p+'%';
+    document.getElementById('prac-thumb').style.left=p+'%';
+    document.getElementById('prac-time').textContent=fmtTime(t)+' / '+fmtTime(d);
+    updatePracWatchWidget();
+  });
+  pracVideo.addEventListener('ended',()=>{pracState.playing=false;updatePracPlayBtn();document.getElementById('prac-watch-dot').classList.remove('live');recordPracWatched();updatePracWatchWidget();});
+}
+function togglePracPlay(){if(pracState.loaded){pracVideo.paused?pracVideo.play():pracVideo.pause();}}
+function updatePracPlayBtn(){document.getElementById('prac-play-btn').innerHTML=pracVideo.paused?'<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>':'<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';}
+function skipPrac(dt){if(pracState.loaded){recordPracWatched();pracVideo.currentTime=Math.max(0,Math.min(pracVideo.duration,pracVideo.currentTime+dt));pracState.currentWatchStart=pracVideo.currentTime;}}
+function pracScrubClick(e){if(!pracState.loaded)return;recordPracWatched();const r=e.currentTarget.getBoundingClientRect();pracVideo.currentTime=((e.clientX-r.left)/r.width)*pracState.duration;pracState.currentWatchStart=pracVideo.currentTime;}
+function recordPracWatched(){if(pracState.currentWatchStart==null)return;const e=pracVideo.currentTime;if(e>pracState.currentWatchStart){pracState.watchedRanges.push([pracState.currentWatchStart,e]);pracState.watchedRanges=mergeRanges(pracState.watchedRanges);}pracState.currentWatchStart=null;}
+function totalPracWatched(){return pracState.watchedRanges.reduce((s,[a,b])=>s+b-a,0)+(pracState.playing&&pracState.currentWatchStart!=null?pracVideo.currentTime-pracState.currentWatchStart:0);}
+function updatePracWatchWidget(){
+  const mws=pracState.minWatchSec||52;
+  const w=Math.min(totalPracWatched(),mws);
+  document.getElementById('prac-watch-label').textContent=Math.floor(w)+'s / '+mws+'s';
+  document.getElementById('prac-watch-bar').style.width=(w/mws*100)+'%';
+  if(w>=mws){
+    document.getElementById('prac-unlock-hint').classList.add('hidden');
+    document.getElementById('prac-quest-section').classList.add('visible');
+  }
+}
+const PRAC_TAG_BTN_IDS={like_design:'prac-btn-like',dislike_design:'prac-btn-dislike',design_good:'prac-btn-good',design_bad:'prac-btn-bad'};
+function pracMarkTag(tag){
+  if(!pracState.loaded){showToast('請先播放影片','error');return;}
+  var t=pracVideo.currentTime;
+  var label=TAG_LABELS[tag]||tag;
+  pracState.annotations.push({id:Date.now(),time:t,emotion:tag,label:label});
+  renderPracAnnotations();
+  markPracTask('selectEmo');markPracTask('markOnce');
+  var btn=document.getElementById(PRAC_TAG_BTN_IDS[tag]);
+  if(btn){btn.classList.add('flash');setTimeout(function(){btn.classList.remove('flash');},300);}
+  showToast(label+' @ '+fmtTime(t),'success');
+}
+function selPracEmo(el){}  // legacy stub
+function pracMark(){}  // legacy stub
+function pracMarkValence(){}  // legacy stub
+function pracMarkCustom(){}  // legacy stub
+function renderPracAnnotations(){const track=document.getElementById('prac-ann-track'),list=document.getElementById('prac-ann-list'),d=pracState.duration||80;track.querySelectorAll('.ann-pip').forEach(p=>p.remove());pracState.annotations.forEach(ann=>{const pip=document.createElement('div');pip.className='ann-pip';var col=TAG_COLORS[ann.emotion]||getEmoColor(ann.emotion);pip.style.cssText='left:'+(ann.time/d)*100+'%;background:'+col;track.appendChild(pip);});list.innerHTML=pracState.annotations.map(ann=>{var col=TAG_COLORS[ann.emotion]||getEmoColor(ann.emotion);return'<div class="ann-item"><div class="ann-dot" style="background:'+col+'"></div><span class="ann-t">'+fmtTime(ann.time)+'</span><span class="ann-lbl">'+ann.label+'</span></div>';}).join('');}
+function selPracStyle(code,el){document.querySelectorAll('#prac-quest-section .style-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');pracState.pracStyle=code;checkPracQuest();}
+function selPracConf(val,el){document.querySelectorAll('#prac-conf-row .conf-chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');pracState.pracConf=val;checkPracQuest();}
+function onPracDescInput(){const v=document.getElementById('prac-desc-ta').value;pracState.pracDescOk=v.length>=20;document.getElementById('prac-desc-count').textContent=v.length+' 字';checkPracQuest();}
+function checkPracQuest(){if(pracState.pracStyle&&pracState.pracConf&&pracState.pracDescOk&&pracState.scalesSaved){markPracTask('fillQuest');}}
+(function buildPracScales(){
+  var c=document.getElementById('prac-scale-items');c.innerHTML='';
+  SCALES.forEach(function(group){
+    var gTitle=document.createElement('div');
+    gTitle.style.cssText='font-size:10px;font-family:"IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin:10px 0 6px;';
+    gTitle.textContent=group.group;
+    c.appendChild(gTitle);
+    group.items.forEach(function(item){
+      var row=document.createElement('div');row.className='likert-row';row.dataset.max=item.max;row.dataset.key=item.key;
+      var la=document.createElement('div');la.className='likert-anchor';la.textContent=item.lo;
+      var btns=document.createElement('div');btns.className='likert-btns';
+      for(var i=1;i<=item.max;i++){
+        var b=document.createElement('button');b.className='likert-btn';b.textContent=i;
+        b.dataset.val=i;b.dataset.key='prac_'+item.key;
+        b.addEventListener('click',function(){
+          var k=this.dataset.key;
+          document.querySelectorAll('.likert-btn[data-key="'+k+'"]').forEach(function(x){x.classList.remove('sel');});
+          this.classList.add('sel');
+        });
+        btns.appendChild(b);
+      }
+      var ra=document.createElement('div');ra.className='likert-anchor right';ra.textContent=item.hi;
+      row.appendChild(la);row.appendChild(btns);row.appendChild(ra);
+      c.appendChild(row);
+    });
+  });
+})();
+function pracSaveScale(){pracState.scalesSaved=true;checkPracQuest();showToast('量表已儲存','success');}
+
+function finishPractice(){
+  const seed=P.pid.split('').reduce((s,c)=>s+c.charCodeAt(0),0);
+  assignedVideos=assignVideos(seed);
+  sessionData.meta={participantId:P.pid,gender:P.gender,age:P.age,architectureBackground:P.archBg,consentTime:P.consentTime,sessionStart:new Date().toISOString()};
+  sessionData.videos=[];
+  currentVideoIdx=0;
+  goTo('experiment');
+  document.getElementById('topbar-pid').textContent=P.pid;
+  loadExperimentVideo();
+}
+
+/* ════ MAIN VIDEO ════ */
+const video=document.getElementById('main-video');
+const canvas=document.getElementById('annotation-canvas');
+const ctx=canvas.getContext('2d');
+
+function loadExperimentVideo(){
+  const vinfo=assignedVideos[currentVideoIdx];
+  // reset state
+  state.loaded=false;state.playing=false;state.watchedRanges=[];state.currentWatchStart=null;
+  state.annotations=[];state.selectedEmo=null;state.drawAnnotations=[];
+  postState.style=null;postState.conf=null;postState.descText='';postState.audioBlob=null;
+  // detach old listeners
+  video.onplay=null;video.onpause=null;video.onended=null;video.ontimeupdate=null;video.onseeking=null;video.onseeked=null;
+  // reset UI
+  document.getElementById('watch-dot').classList.remove('live');
+  document.getElementById('watch-label').textContent='0s / —';
+  document.getElementById('watch-bar').style.width='0%';
+  document.getElementById('next-video-btn').disabled=true;
+  document.getElementById('next-video-btn2').disabled=true;
+  document.getElementById('scrubber-fill').style.width='0%';
+  document.getElementById('scrubber-thumb').style.left='0%';
+  document.getElementById('dur-label').textContent='—';
+  document.getElementById('ctrl-time').textContent='0:00 / 0:00';
+  document.getElementById('ann-list').innerHTML='';
+  document.getElementById('ann-track').querySelectorAll('.ann-pip').forEach(p=>p.remove());
+  document.getElementById('watched-segs').innerHTML='';
+  document.getElementById('topbar-video-info').textContent='影片 '+(currentVideoIdx+1)+' / '+VIDEOS_PER_SESS;
+  // reset questionnaire
+  document.querySelectorAll('#quest-section .style-card').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.conf-chip').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('desc-ta').value='';
+  document.getElementById('desc-count').textContent='0 字';
+  document.getElementById('voice-status').textContent='';
+  document.getElementById('quest-section').classList.remove('visible');
+  document.getElementById('quest-unlock-hint').classList.remove('hidden');
+  buildPostScales();
+  // load video
+  const loadEl=document.getElementById('video-loading');
+  document.getElementById('video-loading-text').textContent='載入影片 '+(currentVideoIdx+1)+'/'+VIDEOS_PER_SESS+'...';
+  loadEl.style.display='flex';video.style.display='none';
+  // set src
+  if(window._preloadedVideo&&window._preloadedVideoIdx===currentVideoIdx){
+    video.src=window._preloadedVideo.src;
+    window._preloadedVideo=null;window._preloadedVideoIdx=null;
+  }else{
+    video.src=vinfo.url;
+  }
+  // disable play button while loading
+  document.getElementById('play-btn').disabled=true;
+  document.getElementById('main-buf-fill').style.width='0%';
+  document.getElementById('main-wait-sub').textContent='正在連線至伺服器';
+  video.load();
+  video.addEventListener('progress',function onProg(){
+    if(!video.duration)return;
+    var pct=0;
+    if(video.buffered.length>0)pct=Math.min(100,Math.round(video.buffered.end(video.buffered.length-1)/video.duration*100));
+    document.getElementById('main-buf-fill').style.width=pct+'%';
+    document.getElementById('main-wait-sub').textContent='緩衝中… '+pct+'%';
+  });
+  video.addEventListener('loadedmetadata',function onMeta(){
+    video.removeEventListener('loadedmetadata',onMeta);
+    state.duration=video.duration;state.loaded=true;
+    const pct=DEV_MODE?0.10:WATCH_THRESHOLD_PCT;
+    state.minWatchSec=Math.round(video.duration*pct);
+    document.getElementById('dur-label').textContent=fmtTime(video.duration);
+    document.getElementById('watch-label').textContent='0s / '+state.minWatchSec+'s';
+    loadEl.style.display='none';video.style.display='block';
+    document.getElementById('play-btn').disabled=false;
+    initCanvas();setupVideoListeners();updatePlayBtn();
+    saveSession();
+  });
+  video.addEventListener('error',function onErr(){
+    video.removeEventListener('error',onErr);
+    document.getElementById('video-loading-text').textContent='⚠ 影片載入失敗，請檢查網路連線';
+    document.getElementById('main-wait-sub').innerHTML='<button onclick="loadExperimentVideo()" style="margin-top:10px;padding:8px 20px;border-radius:6px;border:1px solid #888;background:#fff;cursor:pointer;font-size:13px">重新載入</button>';
+  });
+  // preload next
+  if(currentVideoIdx+1<VIDEOS_PER_SESS){
+    const nv=assignedVideos[currentVideoIdx+1];
+    const pre=document.createElement('video');pre.preload='auto';pre.src=nv.url;pre.load();
+    window._preloadedVideo=pre;window._preloadedVideoIdx=currentVideoIdx+1;
+  }
+}
+
+function setupVideoListeners(){
+  video.onplay=()=>{state.playing=true;state.currentWatchStart=video.currentTime;document.getElementById('watch-dot').classList.add('live');updatePlayBtn();};
+  video.onpause=()=>{state.playing=false;recordWatched();document.getElementById('watch-dot').classList.remove('live');updatePlayBtn();};
+  video.onended=()=>{state.playing=false;recordWatched();updatePlayBtn();};
+  video.ontimeupdate=onTimeUpdate;
+  video.onseeking=()=>{if(state.currentWatchStart!==null)recordWatched();};
+  video.onseeked=()=>{state.currentWatchStart=video.currentTime;};
+}
+function recordWatched(){if(state.currentWatchStart===null)return;const e=video.currentTime;if(e>state.currentWatchStart){state.watchedRanges.push([state.currentWatchStart,e]);state.watchedRanges=mergeRanges(state.watchedRanges);}state.currentWatchStart=null;renderWatchedSegs();updateWatchWidget();}
+function mergeRanges(r){if(!r.length)return[];r.sort((a,b)=>a[0]-b[0]);const m=[r[0]];for(let i=1;i<r.length;i++){const l=m[m.length-1];if(r[i][0]<=l[1])l[1]=Math.max(l[1],r[i][1]);else m.push(r[i]);}return m;}
+function totalWatched(){return state.watchedRanges.reduce((s,[a,b])=>s+b-a,0)+(state.playing&&state.currentWatchStart!==null?video.currentTime-state.currentWatchStart:0);}
+function onTimeUpdate(){const t=video.currentTime,d=state.duration||80,p=d?(t/d)*100:0;document.getElementById('scrubber-fill').style.width=p+'%';document.getElementById('scrubber-thumb').style.left=p+'%';document.getElementById('ctrl-time').textContent=fmtTime(t)+' / '+fmtTime(d);updateWatchWidget();}
+function updateWatchWidget(){
+  const mws=state.minWatchSec||52;
+  const w=Math.min(totalWatched(),mws);
+  document.getElementById('watch-label').textContent=Math.floor(w)+'s / '+mws+'s';
+  document.getElementById('watch-bar').style.width=(w/mws*100)+'%';
+  if(w>=mws){
+    document.getElementById('next-video-btn').disabled=false;
+    document.getElementById('quest-unlock-hint').classList.add('hidden');
+    document.getElementById('quest-section').classList.add('visible');
+  }
+}
+function renderWatchedSegs(){const d=state.duration||80;document.getElementById('watched-segs').innerHTML=state.watchedRanges.map(([a,b])=>'<div class="watched-seg" style="left:'+(a/d)*100+'%;width:'+((b-a)/d)*100+'%"></div>').join('');}
+function togglePlay(){if(state.loaded){video.paused?video.play():video.pause();}}
+function updatePlayBtn(){document.getElementById('play-btn').innerHTML=video.paused?'<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>':'<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';}
+function skipTime(dt){if(state.loaded){recordWatched();video.currentTime=Math.max(0,Math.min(video.duration,video.currentTime+dt));state.currentWatchStart=video.currentTime;}}
+function scrubberClick(e){if(!state.loaded)return;recordWatched();const r=e.currentTarget.getBoundingClientRect();video.currentTime=((e.clientX-r.left)/r.width)*state.duration;state.currentWatchStart=video.currentTime;}
+function initCanvas(){canvas.width=document.getElementById('video-stage').clientWidth;canvas.height=document.getElementById('video-stage').clientHeight;}
+window.addEventListener('resize',()=>{if(state.loaded)initCanvas();});
+const TAG_LABELS={like_design:'👍 喜歡這邊的設計',dislike_design:'👎 不喜歡這邊的設計',design_good:'✅ 這邊設計的好',design_bad:'❌ 這邊設計的不好'};
+const TAG_BTN_IDS={like_design:'main-btn-like',dislike_design:'main-btn-dislike',design_good:'main-btn-good',design_bad:'main-btn-bad'};
+const TAG_COLORS={like_design:'#2d7a4e',dislike_design:'#9b3535',design_good:'#1d6a9f',design_bad:'#7a5c1e'};
+function markTag(tag){
+  if(!state.loaded){showToast('請先播放影片','error');return;}
+  var t=video.currentTime;
+  var label=TAG_LABELS[tag]||tag;
+  state.annotations.push({id:Date.now(),time:t,emotion:tag,label:label,timestamp:new Date().toISOString()});
+  state.annotations.sort(function(a,b){return a.time-b.time;});
+  renderAnnotations();
+  var btn=document.getElementById(TAG_BTN_IDS[tag]);
+  if(btn){btn.classList.add('flash');setTimeout(function(){btn.classList.remove('flash');},300);}
+  showToast(label+' @ '+fmtTime(t),'success');
+}
+function selectEmo(el){}  // legacy stub
+function markAnnotation(){}  // legacy stub
+function markValence(){}  // legacy stub
+function markCustom(){}  // legacy stub
+function renderAnnotations(){
+  var track=document.getElementById('ann-track'),list=document.getElementById('ann-list'),d=state.duration||80;
+  track.querySelectorAll('.ann-pip').forEach(function(p){p.remove();});
+  state.annotations.forEach(function(ann){
+    var pip=document.createElement('div');pip.className='ann-pip';
+    var col=TAG_COLORS[ann.emotion]||getEmoColor(ann.emotion);
+    pip.style.cssText='left:'+(ann.time/d)*100+'%;background:'+col;
+    pip.dataset.label=(ann.label||ann.emotion)+' @ '+fmtTime(ann.time);
+    pip.onclick=function(){video.currentTime=ann.time;};
+    track.appendChild(pip);
+  });
+  list.innerHTML=state.annotations.map(function(ann){
+    var col=TAG_COLORS[ann.emotion]||getEmoColor(ann.emotion);
+    return '<div class="ann-item"><div class="ann-dot" style="background:'+col+'"></div><span class="ann-t">'+fmtTime(ann.time)+'</span><span class="ann-lbl">'+(ann.label||ann.emotion)+'</span><button class="ann-del" onclick="event.stopPropagation();deleteAnn('+ann.id+')">×</button></div>';
+  }).join('');
+}
+function deleteAnn(id){state.annotations=state.annotations.filter(a=>a.id!==id);renderAnnotations();}
+
+/* ════ QUESTIONNAIRE ════ */
+function buildPostScales(){
+  var c=document.getElementById('post-scale-container');c.innerHTML='';
+  SCALES.forEach(function(group,gi){
+    var wrap=document.createElement('div');
+    wrap.className='scale-group-wrap';
+    var gTitle=document.createElement('div');
+    gTitle.className='scale-group-label';
+    gTitle.textContent=group.group;
+    wrap.appendChild(gTitle);
+    group.items.forEach(function(item){
+      var row=document.createElement('div');
+      row.className='likert-row';
+      row.dataset.max=item.max;
+      row.dataset.key=item.key;
+      var la=document.createElement('div');la.className='likert-anchor';la.textContent=item.lo;
+      var btns=document.createElement('div');btns.className='likert-btns';
+      for(var i=1;i<=item.max;i++){
+        var b=document.createElement('button');b.className='likert-btn';b.textContent=i;
+        b.dataset.val=i;b.dataset.key=item.key;
+        b.addEventListener('click',function(){
+          var k=this.dataset.key;
+          document.querySelectorAll('.likert-btn[data-key="'+k+'"]').forEach(function(x){x.classList.remove('sel');});
+          this.classList.add('sel');
+          // clear field-error on this row
+          var r=this.closest('.likert-row');if(r)r.classList.remove('field-error');
+          checkPostForm();
+        });
+        btns.appendChild(b);
+      }
+      var ra=document.createElement('div');ra.className='likert-anchor right';ra.textContent=item.hi;
+      row.appendChild(la);row.appendChild(btns);row.appendChild(ra);
+      wrap.appendChild(row);
+    });
+    c.appendChild(wrap);
+  });
+}
+function selStyle(code,el){document.querySelectorAll('#quest-section .style-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');postState.style=code;checkPostForm();}
+function selConf(val,el){document.querySelectorAll('.conf-chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');postState.conf=val;checkPostForm();}
+function onDescInput(){const v=document.getElementById('desc-ta').value;postState.descText=v;const cnt=v.length;document.getElementById('desc-count').textContent=cnt+' 字';document.getElementById('desc-count').style.color=cnt>=20?'var(--accent)':'var(--ink4)';checkPostForm();}
+function checkPostForm(){
+  var scalesDone=true;
+  SCALES.forEach(function(g){g.items.forEach(function(item){
+    if(!document.querySelector('.likert-btn.sel[data-key="'+item.key+'"]'))scalesDone=false;
+  });});
+  document.getElementById('next-video-btn2').disabled=!(postState.style!==null&&postState.conf!==null&&postState.descText.length>=20&&scalesDone);
+}
+function validateAndSubmit(){
+  var errors=[];
+  // clear previous errors
+  document.querySelectorAll('.field-error').forEach(function(e){e.classList.remove('field-error');});
+  // style
+  if(postState.style===null){
+    document.querySelector('#quest-section .section-block').classList.add('field-error');
+    errors.push('請選擇風格判斷');
+  }
+  // confidence
+  if(postState.conf===null){
+    document.getElementById('conf-row').classList.add('field-error');
+    errors.push('請選擇信心程度');
+  }
+  // description
+  if(postState.descText.length<20){
+    document.getElementById('desc-ta').classList.add('field-error');
+    errors.push('空間描述至少需要 20 字');
+  }
+  // scales
+  var firstMissing=null;
+  SCALES.forEach(function(g){g.items.forEach(function(item){
+    var row=document.querySelector('.likert-row[data-key="'+item.key+'"]');
+    if(row&&!document.querySelector('.likert-btn.sel[data-key="'+item.key+'"]')){
+      row.classList.add('field-error');
+      if(!firstMissing)firstMissing=row;
+      errors.push('量表「'+item.label+'」尚未評分');
+    }
+  });});
+  if(errors.length>0){
+    showToast('請完成所有必填項目','error');
+    var first=document.querySelector('.field-error');
+    if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  submitPostVideo();
+}
+let mediaRecorder=null,audioChunks=[];
+async function toggleVoice(){
+  const btn=document.getElementById('voice-btn'),status=document.getElementById('voice-status');
+  if(mediaRecorder&&mediaRecorder.state==='recording'){mediaRecorder.stop();return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    audioChunks=[];mediaRecorder=new MediaRecorder(stream);
+    mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+    mediaRecorder.onstop=()=>{postState.audioBlob=new Blob(audioChunks,{type:'audio/webm'});stream.getTracks().forEach(t=>t.stop());btn.textContent='🎙 重新錄音';status.textContent='✓ 錄音完成（'+Math.round(postState.audioBlob.size/1024)+'KB）';};
+    mediaRecorder.start();btn.textContent='⏹ 停止錄音';btn.style.borderColor='var(--danger)';btn.style.color='var(--danger)';status.textContent='● 錄音中...';
+  }catch(e){status.textContent='⚠ 無法存取麥克風，請使用文字輸入';}
+}
+function getScaleValues(){
+  var vals={};
+  document.querySelectorAll('#post-scale-container .likert-btn.sel').forEach(function(el){
+    vals[el.dataset.key]=Number(el.dataset.val);
+  });
+  return vals;
+}
+function goToPostVideo(){} // legacy stub
+function submitPostVideo(){
+  const vinfo=assignedVideos[currentVideoIdx];
+  const vidEl=document.getElementById('main-video');
+  sessionData.videos.push({
+    order:currentVideoIdx+1,videoId:vinfo.videoId,style:vinfo.style,spaceNum:vinfo.spaceNum,
+    watchedSeconds:Math.round(totalWatched()),
+    styleGuess:postState.style,styleGuessCorrect:postState.style===vinfo.style,styleConfidence:postState.conf,
+    description:postState.descText,hasAudio:postState.audioBlob!==null,
+    timestamps:state.annotations.map(({time,emotion})=>({time:Math.round(time*100)/100,emotion})),
+    scales:getScaleValues(),
+    videoDisplayW:vidEl?vidEl.clientWidth:null,
+    videoDisplayH:vidEl?vidEl.clientHeight:null,
+  });
+  currentVideoIdx++;
+  saveSession();
+  if(currentVideoIdx>=VIDEOS_PER_SESS){finishExperiment();}
+  else{loadExperimentVideo();window.scrollTo(0,0);showToast('✓ 第'+currentVideoIdx+'部完成，載入第'+(currentVideoIdx+1)+'部...','success');}
+}
+
+/* ════ FINISH ════ */
+function finishExperiment(){
+  sessionData.meta.sessionEnd=new Date().toISOString();
+  sessionData.meta.userAgent=navigator.userAgent;
+  sessionData.meta.screenW=screen.width;
+  sessionData.meta.screenH=screen.height;
+  sessionData.meta.devicePixelRatio=window.devicePixelRatio||1;
+  if(DEV_MODE)sessionData.meta.devMode=true;
+  const code=(DEV_MODE?'DEV-':'')+genCompletionCode();
+  sessionData.meta.completionCode=code;
+  document.getElementById('completion-code').textContent=code;
+  document.getElementById('complete-email').textContent=RESEARCH_EMAIL;
+  document.getElementById('complete-email2')&&(document.getElementById('complete-email2').textContent=RESEARCH_EMAIL);
+  // mark this participant code as done in localStorage
+  if(P.participantCode){
+    const done=JSON.parse(localStorage.getItem('as_done_codes')||'[]');
+    if(!done.includes(P.participantCode)){done.push(P.participantCode);localStorage.setItem('as_done_codes',JSON.stringify(done));}
+  }
+  clearSession();
+  goTo('complete');
+  if(DEV_MODE){
+    const banner=document.createElement('div');
+    banner.style.cssText='background:var(--accent2);color:#fff;font-size:11px;font-family:"IBM Plex Mono",monospace;padding:6px 14px;border-radius:6px;text-align:center;margin-bottom:14px';
+    banner.textContent='⚙ DEV MODE — '+VIDEOS_PER_SESS+' 部影片 / 觀看門檻 '+(DEV_MODE?'10':'65')+'% / 資料已送出（標記 DEV）';
+    const card=document.querySelector('#screen-complete .card');
+    card.insertBefore(banner,card.firstChild);
+  }
+  submitToSheets(code);
+}
+async function submitToSheets(code){
+  const statusEl=document.getElementById('submit-status');
+  statusEl.textContent='⏳ 資料上傳中...';
+  // build flat scale columns for Sheets
+  const scaleKeys=[];SCALES.forEach(g=>g.items.forEach(i=>scaleKeys.push(i.key)));
+  const rows=sessionData.videos.map(function(v){
+    const flat={};scaleKeys.forEach(k=>{flat['scale_'+k]=v.scales?v.scales[k]??'':''});
+    return Object.assign({},v,flat,{scales:undefined,timestamps:JSON.stringify(v.timestamps||[])});
+  });
+  const payload=JSON.stringify({
+    token: GAS_TOKEN,
+    meta: sessionData.meta,
+    participantCode: P.participantCode||'',
+    completionCode: code,
+    email: P.email,
+    userAgent: navigator.userAgent,
+    screenResolution: screen.width+'x'+screen.height,
+    devicePixelRatio: window.devicePixelRatio||1,
+    videos: rows,
+    devMode: DEV_MODE
+  },function(k,v){return k==='audioBlob'?null:v;});
+  var attempts=0;
+  async function trySend(){
+    attempts++;
+    try{
+      await fetch(SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:payload});
+      statusEl.textContent='✓ 資料已送出（'+new Date().toLocaleTimeString('zh-TW')+'）';
+      showToast('✓ 資料已送出','success');
+    }catch(e){
+      if(attempts<3){
+        statusEl.textContent='⚠ 第'+attempts+'次上傳失敗，5 秒後重試...';
+        setTimeout(trySend,5000);
+      }else{
+        statusEl.textContent='⚠ 上傳失敗，請下載備份 JSON 並寄至 '+RESEARCH_EMAIL;
+        showToast('上傳失敗，請下載備份','error');
+        document.getElementById('download-json-btn')&&(document.getElementById('download-json-btn').style.borderColor='var(--danger)');
+      }
+    }
+  }
+  trySend();
+}
+function genCompletionCode(){const ts=Date.now().toString(36).toUpperCase();const pid=P.pid.replace('-','').substring(0,4).padEnd(4,'X');const cs=(pid+ts).split('').reduce((s,c)=>s+c.charCodeAt(0),0).toString(36).toUpperCase().substring(0,2);return pid+'-'+ts+'-'+cs;}
+function copyCode(){navigator.clipboard.writeText(document.getElementById('completion-code').textContent).then(()=>showToast('完成碼已複製','success'));}
+function downloadJSON(){const blob=new Blob([JSON.stringify(sessionData,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='archsense_'+P.pid+'_'+Date.now()+'.json';a.click();showToast('JSON 已下載','success');}
+
+/* ════ PRACTICE GUIDE ════ */
+var pracGuideStep=0;
+var pracGuideMax=4;
+function advancePracGuide(toStep){
+  if(toStep<=pracGuideStep)return;
+  // mark previous done
+  for(var i=pracGuideStep;i<toStep;i++){
+    var row=document.getElementById('pstep-'+i);
+    var num=document.getElementById('pstep-num-'+i);
+    if(row)row.classList.remove('active-step');
+    if(num){num.className='prac-step-num done';num.textContent='✓';}
+  }
+  pracGuideStep=toStep;
+  // activate new step
+  if(toStep<pracGuideMax){
+    var newRow=document.getElementById('pstep-'+toStep);
+    var newNum=document.getElementById('pstep-num-'+toStep);
+    if(newRow)newRow.classList.add('active-step');
+    if(newNum)newNum.className='prac-step-num active';
+  }
+  var prog=document.getElementById('prac-guide-progress');
+  if(prog)prog.textContent=Math.min(toStep,pracGuideMax)+' / '+pracGuideMax;
+  // animate hint keys for new step
+  if(toStep===1){setTimeout(()=>{animGuideKey('pkd-q');setTimeout(()=>animGuideKey('pkd-e'),200);setTimeout(()=>animGuideKey('pkd-z'),400);setTimeout(()=>animGuideKey('pkd-c'),600);},400);}
+}
+function animGuideKey(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.classList.remove('pulse');
+  void el.offsetWidth;
+  el.classList.add('pulse');
+  setTimeout(()=>el.classList.remove('pulse'),700);
+}
+// hook into existing task marking
+var _origMarkPracTask=markPracTask;
+markPracTask=function(key){
+  _origMarkPracTask(key);
+  if(key==='playVideo')advancePracGuide(1);
+  else if(key==='markOnce')advancePracGuide(2);
+};
+// advance guide to step 3 when quest unlocks
+var _origUpdatePracWatchWidget=updatePracWatchWidget;
+updatePracWatchWidget=function(){
+  _origUpdatePracWatchWidget();
+  var mws=pracState.minWatchSec||52;
+  var w=Math.min(totalPracWatched(),mws);
+  if(w>=mws)advancePracGuide(3);
+};
+// advance guide to step 4 when checkPracQuest passes
+var _origCheckPracQuest=checkPracQuest;
+checkPracQuest=function(){
+  _origCheckPracQuest();
+  if(pracState.pracStyle&&pracState.pracConf&&pracState.pracDescOk&&pracState.scalesSaved)advancePracGuide(4);
+};
+
+/* ════ UTILS ════ */
+const EMO_COLORS={'舒適':'#2d7a4e','開闊':'#1d6a9f','壓迫':'#9b3535','溫暖':'#a06020','冷靜':'#4a5a9a','驚喜':'#8a3a70','自然':'#3d7a30','孤寂':'#5a6070'};
+const getEmoColor=emo=>EMO_COLORS[emo]||'#8a8280';
+function fmtTime(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+String(sec).padStart(2,'0');}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'')+' show';clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);}
+
+/* ════ KEYBOARD ════ */
+// Q=like_design  E=dislike_design  (top row, left/right symmetric)
+// Z=design_good  C=design_bad      (bottom row, left/right symmetric)
+// Space = play/pause
+const TAG_KEYS={KeyQ:'like_design',KeyE:'dislike_design',KeyZ:'design_good',KeyC:'design_bad'};
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  var active=document.querySelector('.screen.active');
+  if(!active)return;
+  // Space = play / pause
+  if(e.code==='Space'){
+    e.preventDefault();
+    if(active.id==='screen-practice')togglePracPlay();
+    else if(active.id==='app-screen')togglePlay();
+    return;
+  }
+  // Q/E/Z/C = annotation tags
+  if(TAG_KEYS[e.code]){
+    e.preventDefault();
+    var tag=TAG_KEYS[e.code];
+    if(active.id==='screen-practice')pracMarkTag(tag);
+    else if(active.id==='app-screen')markTag(tag);
+  }
+});
+
+/* ════ INIT ════ */
+// device block — phones only, allow tablet+desktop
+(function(){
+  const w=window.innerWidth||screen.width;
+  const ua=navigator.userAgent;
+  const isPhone=/Android.*Mobile|iPhone|iPod/i.test(ua);
+  if(isPhone||w<768){
+    document.body.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 24px;background:#f5f3ef;font-family:sans-serif;text-align:center"><div><div style="font-size:40px;margin-bottom:16px">💻</div><div style="font-size:18px;font-weight:600;margin-bottom:10px">請使用電腦或平板參與本研究</div><div style="font-size:14px;color:#5a5248;line-height:1.7">本實驗需要較大的螢幕才能正確顯示影片與問卷。<br>請改用電腦（Windows / Mac）或平板裝置開啟此連結。</div></div></div>';
+    return;
+  }
+  renderTaskPills();
+  document.getElementById('complete-email')&&(document.getElementById('complete-email').textContent=RESEARCH_EMAIL);
+  if(DEV_MODE){
+    const bar=document.createElement('div');
+    bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--accent2);color:#fff;font-size:11px;font-family:"IBM Plex Mono",monospace;letter-spacing:.06em;padding:4px 16px;text-align:center;pointer-events:none';
+    bar.textContent='⚙  DEV MODE  —  '+VIDEOS_PER_SESS+' 部影片 / 觀看門檻 10% / ?dev=1';
+    document.body.prepend(bar);
+    document.body.style.paddingTop='24px';
+  }
+  restoreSession();
+})();
+</script>
+</body>
+</html>
