@@ -413,22 +413,132 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .tag-bad:hover,.tag-bad.flash{background:var(--warn-l);border-color:var(--warn)}
 
 /* ── FIELD ERROR ── */
-.field-error{outline:2px solid var(--danger)!important;outline-offset:2px;border-radius:var(--r2)}
+.field-error{outline:1px solid var(--danger)!important;outline-offset:2px;border-radius:var(--r2)}
 .field-error textarea,.field-error input{border-color:var(--danger)!important}
-textarea.field-error{outline:2px solid var(--danger)!important}
+textarea.field-error{outline:1px solid var(--danger)!important}
 /* ── SCALE GROUP DIVIDER ── */
 .scale-group-wrap{border-top:1px solid var(--border);margin-top:14px;padding-top:12px}
 .scale-group-wrap:first-child{border-top:none;margin-top:0;padding-top:0}
 .scale-group-label{font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;padding-bottom:6px;display:flex;align-items:center;gap:8px}
 .scale-group-label::after{content:'';flex:1;height:1px;background:var(--border)}
-.likert-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.likert-anchor{font-size:11px;color:var(--ink3);white-space:nowrap;min-width:60px}
+.likert-row{margin-bottom:14px;padding-top:12px;border-top:.5px solid var(--border)}
+.likert-row:first-of-type{border-top:none;padding-top:0}
+.likert-anchors{display:flex;justify-content:space-between;font-size:13px;font-weight:500;color:var(--ink2);margin-bottom:7px;padding:0 2px}
+.likert-anchor{font-size:13px;font-weight:500;color:var(--ink2);white-space:nowrap}
 .likert-anchor.right{text-align:right}
-.likert-btns{display:flex;gap:4px;flex:1;justify-content:center}
-.likert-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:12px;font-weight:600;font-family:'IBM Plex Mono',monospace;color:var(--ink3);transition:all .13s;display:flex;align-items:center;justify-content:center}
-.likert-btn:hover{border-color:var(--border2);color:var(--ink);transform:scale(1.1)}
+.likert-btns{display:flex;gap:2.8px;justify-content:space-between}
+.likert-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:11px;font-weight:500;font-family:'IBM Plex Mono',monospace;color:var(--ink3);transition:all .13s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.likert-btn:hover{border-color:var(--border2);color:var(--ink);transform:scale(1.08)}
 .likert-btn.sel{border-color:var(--accent);background:var(--accent);color:#fff}
-.likert-row[data-max="5"] .likert-btn{width:38px;height:38px}
+.likert-row[data-max="5"] .likert-btn{width:32px;height:32px}
+
+/* ── VOICE BUTTON ── */
+#voice-btn:active, #voice-btn.listening, #prac-voice-btn:active, #prac-voice-btn.listening {
+  border-color: var(--danger) !important;
+  background: var(--danger-l) !important;
+  color: var(--danger) !important;
+  transform: scale(1.03);
+}
+#voice-btn.listening, #prac-voice-btn.listening {
+  animation: voice-pulse 1s infinite;
+}
+@keyframes voice-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(139,32,32,.2); }
+  50%      { box-shadow: 0 0 0 6px rgba(139,32,32,.06); }
+}
+
+/* ── REST SCREEN ── */
+#screen-rest .exp-wrap{display:flex}
+#rest-ring{transition:stroke-dashoffset 1s linear}
+
+/* ════════════════════════════════
+   LAYOUT VARIANTS
+   A = default (single column, scroll)
+   B = sticky video, quest scrolls
+   C = side-by-side (video left, quest right)
+════════════════════════════════ */
+
+/* ── Layout B: sticky video ── */
+body.layout-b #app-screen .exp-content {
+  max-width: 900px;
+  padding-bottom: 0;
+}
+body.layout-b .video-sticky-block {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+body.layout-b .quest-scroll-block {
+  overflow-y: auto;
+  padding-bottom: 60px;
+}
+
+/* ── Layout C: side-by-side ── */
+body.layout-c #app-screen .exp-wrap {
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+body.layout-c #app-screen .exp-content {
+  max-width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(520px,55%) 1fr;
+  grid-template-rows: 1fr;
+  column-gap: 0;
+  padding: 0;
+  align-items: stretch;
+}
+body.layout-c .video-sticky-block {
+  grid-column: 1;
+  grid-row: 1;
+  position: sticky;
+  top: 0;
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+  padding: 16px 16px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg);
+}
+body.layout-c .quest-scroll-block {
+  grid-column: 2;
+  grid-row: 1;
+  height: 100%;
+  overflow-y: auto;
+  padding: 12px 20px 60px 16px;
+  max-width: 480px;
+}
+body.layout-c .video-sticky-block .video-wrap {
+  flex: 1;
+  min-height: 0;
+}
+body.layout-c .video-sticky-block .video-wrap video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+/* C: hide redundant unlock hint since quest is always visible */
+body.layout-c .quest-unlock-hint { display: none !important; }
+
+/* Layout badge in topbar */
+.layout-badge {
+  font-size: 9px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: .08em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--bg3);
+  color: var(--ink3);
+  border: 1px solid var(--border);
+  margin-left: 6px;
+}
 </style>
 </head>
 <body>
@@ -500,9 +610,6 @@ textarea.field-error{outline:2px solid var(--danger)!important}
       <div class="check-text">我同意研究團隊依上述方式使用我的匿名資料</div>
     </div>
   </div>
-  <div class="warn-box" style="margin-top:14px">
-    ⚠ 本系統不儲存您的電子郵件。請在完成頁記錄完成碼後，自行寄信申請受試費。
-  </div>
   <div class="field-group" style="margin-top:18px">
     <label class="field-label">受試者代碼 <span style="color:var(--danger)">*</span></label>
     <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">請輸入研究團隊寄給您的受試者代碼（格式：AS-XXXX）</div>
@@ -541,6 +648,9 @@ textarea.field-error{outline:2px solid var(--danger)!important}
   </div>
   <div class="card-title">基本背景資料</div>
   <div class="card-sub">PARTICIPANT BACKGROUND · 全程匿名</div>
+
+  <div id="bg-page-1">
+  <!-- 性別 -->
   <div class="field-group">
     <label class="field-label">性別</label>
     <div class="radio-grid c3" id="gender-grid">
@@ -549,16 +659,20 @@ textarea.field-error{outline:2px solid var(--danger)!important}
       <div class="radio-card" onclick="selRadio('gender','非二元',this)">非二元</div>
     </div>
   </div>
+
+  <!-- 年齡 -->
   <div class="field-group">
     <label class="field-label">年齡</label>
     <div style="display:flex;align-items:center;gap:10px">
-      <input type="number" id="age-input" min="16" max="99" placeholder="請輸入年齡"
+      <input type="number" id="age-input" min="18" max="99" placeholder="請輸入年齡"
         style="width:140px;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:15px;font-family:'IBM Plex Mono',monospace;background:var(--surface2);color:var(--ink)"
         oninput="onAgeInput()">
       <span style="font-size:13px;color:var(--ink3)">歲</span>
     </div>
-    <div id="age-err" style="font-size:11px;color:var(--danger);margin-top:5px;display:none">請輸入有效年齡（16–99）</div>
+    <div id="age-err" style="font-size:11px;color:var(--danger);margin-top:5px;display:none">請輸入有效年齡（18–99）</div>
   </div>
+
+  <!-- 建築背景 -->
   <div class="field-group">
     <label class="field-label">您是否有建築、室內設計或相關領域的學習／工作背景？</label>
     <div class="yesno-row">
@@ -566,10 +680,133 @@ textarea.field-error{outline:2px solid var(--danger)!important}
       <div class="yn-btn no"  id="arch-no"  onclick="selYN(false)">✗ 否</div>
     </div>
   </div>
-  <div class="btn-row">
-    <button class="btn btn-ghost" onclick="goTo('consent')">← 返回</button>
-    <button class="btn btn-primary" id="bg-btn" onclick="confirmBackground()" disabled>繼續 →</button>
+
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goTo('consent')">← 返回</button>
+      <button class="btn btn-primary" onclick="goToBgPage2()">下一頁 →</button>
+    </div>
+  </div><!-- end bg-page-1 -->
+  <div id="bg-page-2" style="display:none">
+  <!-- 分隔線 -->
+  <div style="height:.5px;background:var(--border);margin:18px 0 14px"></div>
+  <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:14px">居住背景</div>
+
+  <!-- 現居地 郵遞區號 -->
+  <div class="field-group">
+    <label class="field-label">現居地（郵遞區號）</label>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">輸入 3 碼郵遞區號，系統會自動顯示地區</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <input type="text" id="zip-current" maxlength="3" placeholder="例：300"
+        style="width:90px;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:15px;font-family:'IBM Plex Mono',monospace;background:var(--surface2);color:var(--ink);letter-spacing:.1em"
+        oninput="onZipInput('current')">
+      <span id="zip-current-label" style="font-size:13px;color:var(--ink3)">—</span>
+    </div>
+    <div id="zip-current-err" style="font-size:11px;color:var(--danger);margin-top:5px;display:none">找不到此郵遞區號，請確認後重新輸入</div>
   </div>
+
+  <!-- 出生地 郵遞區號 -->
+  <div class="field-group">
+    <label class="field-label">出生地（郵遞區號）</label>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">若出生地不在台灣，請填寫 000</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <input type="text" id="zip-birth" maxlength="3" placeholder="例：700"
+        style="width:90px;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:15px;font-family:'IBM Plex Mono',monospace;background:var(--surface2);color:var(--ink);letter-spacing:.1em"
+        oninput="onZipInput('birth')">
+      <span id="zip-birth-label" style="font-size:13px;color:var(--ink3)">—</span>
+    </div>
+    <div id="zip-birth-err" style="font-size:11px;color:var(--danger);margin-top:5px;display:none">找不到此郵遞區號，請確認後重新輸入（非台灣請填 000）</div>
+  </div>
+
+  <!-- 是否曾在日本或北歐居住 -->
+  <div class="field-group">
+    <label class="field-label">是否曾在日本或北歐國家居住超過 3 個月？</label>
+    <div class="radio-grid c3" id="nordic-grid">
+      <div class="radio-card" onclick="selRadio('livedNordic','是',this)">是</div>
+      <div class="radio-card" onclick="selRadio('livedNordic','否',this)">否</div>
+    </div>
+  </div>
+
+  <!-- 分隔線 -->
+  <div style="height:.5px;background:var(--border);margin:18px 0 14px"></div>
+  <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:14px">居住空間</div>
+
+  <!-- 目前居住空間格局 -->
+  <div class="field-group">
+    <label class="field-label">目前居住空間格局</label>
+    <div class="radio-grid" id="housing-grid">
+      <div class="radio-card" onclick="selRadio('housingType','公寓（有電梯）',this)">公寓（有電梯）</div>
+      <div class="radio-card" onclick="selRadio('housingType','公寓（無電梯）',this)">公寓（無電梯）</div>
+      <div class="radio-card" onclick="selRadio('housingType','透天厝',this)">透天厝</div>
+      <div class="radio-card" onclick="selRadio('housingType','套房／雅房',this)">套房／雅房</div>
+      <div class="radio-card" onclick="selRadio('housingType','學生宿舍',this)">學生宿舍</div>
+      <div class="radio-card" onclick="selRadio('housingType','其他',this)">其他</div>
+    </div>
+  </div>
+
+  <!-- 主要成長過程居住空間格局 -->
+  <div class="field-group">
+    <label class="field-label">主要成長過程（18歲前）的居住空間格局</label>
+    <div class="radio-grid" id="growup-grid">
+      <div class="radio-card" onclick="selRadio('growupType','公寓（有電梯）',this)">公寓（有電梯）</div>
+      <div class="radio-card" onclick="selRadio('growupType','公寓（無電梯）',this)">公寓（無電梯）</div>
+      <div class="radio-card" onclick="selRadio('growupType','透天厝',this)">透天厝</div>
+      <div class="radio-card" onclick="selRadio('growupType','套房／雅房',this)">套房／雅房</div>
+      <div class="radio-card" onclick="selRadio('growupType','學生宿舍',this)">學生宿舍</div>
+      <div class="radio-card" onclick="selRadio('growupType','其他',this)">其他</div>
+    </div>
+  </div>
+
+  <!-- 目前居住坪數 -->
+  <div class="field-group">
+    <label class="field-label">目前居住空間坪數（含公設）</label>
+    <div class="radio-grid" id="size-grid">
+      <div class="radio-card" onclick="selRadio('housingSize','10坪以下',this)">10坪以下</div>
+      <div class="radio-card" onclick="selRadio('housingSize','10–20坪',this)">10–20坪</div>
+      <div class="radio-card" onclick="selRadio('housingSize','20–35坪',this)">20–35坪</div>
+      <div class="radio-card" onclick="selRadio('housingSize','35–50坪',this)">35–50坪</div>
+      <div class="radio-card" onclick="selRadio('housingSize','50坪以上',this)">50坪以上</div>
+    </div>
+  </div>
+
+  <!-- Attention Check — 真實問題，驗證邏輯藏於說明文字 -->
+  <div class="field-group" id="attn-check-group">
+    <label class="field-label">您成長過程中的住家，整體居住環境如何？</label>
+    <div class="radio-grid" id="attn-grid">
+      <div class="radio-card" onclick="selRadio('attnCheck','採光良好、空間寬敞',this)">採光良好、空間寬敞</div>
+      <div class="radio-card" onclick="selRadio('attnCheck','採光普通、空間適中',this)">採光普通、空間適中</div>
+      <div class="radio-card" onclick="selRadio('attnCheck','採光不足、空間侷促',this)">採光不足、空間侷促</div>
+      <div class="radio-card" onclick="selRadio('attnCheck','各時期差異很大',this)">各時期差異很大</div>
+    </div>
+  </div>
+
+  <!-- 獨居或與他人同住 -->
+  <div class="field-group">
+    <label class="field-label">目前居住狀況</label>
+    <div class="radio-grid c3" id="living-grid">
+      <div class="radio-card" onclick="selRadio('livingWith','獨居',this)">獨居</div>
+      <div class="radio-card" onclick="selRadio('livingWith','與家人同住',this)">與家人同住</div>
+      <div class="radio-card" onclick="selRadio('livingWith','與室友同住',this)">與室友同住</div>
+    </div>
+  </div>
+
+  <!-- 裝潢規劃參與 -->
+  <div class="field-group">
+    <label class="field-label">是否曾參與自己居住空間的裝潢規劃？</label>
+    <div class="radio-grid" id="renov-grid">
+      <div class="radio-card" onclick="selRadio('renovation','沒有',this)">沒有</div>
+      <div class="radio-card" onclick="selRadio('renovation','有，輕度（油漆、傢俱）',this)">有，輕度</div>
+      <div class="radio-card" onclick="selRadio('renovation','有，中度（局部施工）',this)">有，中度</div>
+      <div class="radio-card" onclick="selRadio('renovation','有，全室翻修',this)">有，全室翻修</div>
+    </div>
+  </div>
+
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goToBgPage1()">← 上一頁</button>
+      <button class="btn btn-primary" id="bg-btn" onclick="confirmBackground()">繼續 →</button>
+    </div>
+  </div><!-- end bg-page-2 -->
 </div>
 </div>
 </div>
@@ -597,12 +834,12 @@ textarea.field-error{outline:2px solid var(--danger)!important}
   </div>
 
   <!-- PID reveal -->
-  <div class="card-title">您的參與代號</div>
-  <div class="card-sub">PARTICIPANT ID · 系統自動分配，請記下以備查詢</div>
+  <div class="card-title">確認您的受試者代碼</div>
+  <div class="card-sub">PARTICIPANT CODE · 請確認與邀請信一致</div>
   <div class="pid-reveal">
-    <div class="pid-label">YOUR PARTICIPANT ID</div>
-    <div class="pid-code" id="pid-display">P–????</div>
-    <div class="pid-note">此代號已儲存於您的實驗資料中<br>完成後可憑完成碼（非此代號）申請受試費</div>
+    <div class="pid-label">YOUR PARTICIPANT CODE</div>
+    <div class="pid-code" id="pid-display">AS–????</div>
+    <div class="pid-note">此代碼已與您的實驗資料連結<br>完成後憑完成碼申請受試費（非此代碼）</div>
   </div>
 
   <div style="border-top:1px solid var(--border);padding-top:24px;margin-top:4px">
@@ -610,48 +847,67 @@ textarea.field-error{outline:2px solid var(--danger)!important}
     <div class="card-sub">請閱讀後進行練習，熟悉操作才能開始正式實驗</div>
 
     <div class="tutorial-grid">
+
       <div class="tut-card">
-        <div class="tut-icon-wrap green" style="font-size:18px">🎬</div>
+        <div class="tut-icon-wrap green" style="font-size:20px">▶</div>
         <div class="tut-body">
-          <div class="tut-title">播放與即時標注</div>
-          <div class="tut-desc">觀看影片時，用畫面下方的<strong>四個按鈕</strong>記錄當下感受：<br>
-          <strong style="color:var(--accent)">Q</strong> 喜歡這邊的設計 ／ <strong style="color:var(--danger)">E</strong> 不喜歡<br>
-          <strong style="color:var(--expert)">Z</strong> 這邊設計的好 ／ <strong style="color:var(--warn)">C</strong> 設計的不好<br>
-          也可直接用鍵盤按 Q / E / Z / C 快速標記。</div>
-          <span class="tut-hint">💡 Space 鍵 = 播放／暫停</span>
+          <div class="tut-title">播放影片</div>
+          <div class="tut-desc">
+            影片<strong>不會自動播放</strong>。按影片下方 ▶ 鍵，或鍵盤 <strong>Space</strong> 開始；再按一次暫停。<br>
+            可用 <strong>◀◀ / ▶▶</strong> 前後跳 5 秒，或直接拖拉進度條。<br>
+            需累積觀看到進度條滿格，問卷才會解鎖。
+          </div>
+          <span class="tut-hint">⌨ Space = 播放／暫停　◀◀ / ▶▶ = 前後 5 秒</span>
         </div>
       </div>
+
       <div class="tut-card">
-        <div class="tut-icon-wrap brown" style="font-size:18px">📊</div>
+        <div class="tut-icon-wrap brown" style="font-size:20px">🏷</div>
         <div class="tut-body">
-          <div class="tut-title">看完後填寫問卷</div>
-          <div class="tut-desc">觀看滿 20 秒後，問卷區塊自動解鎖，包含三個部分：<br>
-          ① <strong>風格判斷</strong>：猜測空間風格 + 信心程度<br>
-          ② <strong>空間描述</strong>：用文字描述感受（至少 20 字）<br>
-          ③ <strong>量表評分</strong>：對各維度點選評分後按「儲存」</div>
-          <span class="tut-hint">💡 量表填完記得按「儲存量表評分」</span>
+          <div class="tut-title">即時標注（邊看邊按）</div>
+          <div class="tut-desc">
+            觀看時，有感受的畫面請立即按下方按鈕標記：<br>
+            <strong style="color:var(--accent)">👍 喜歡這個場景的設計</strong> — 鍵盤 <strong>L</strong><br>
+            <strong style="color:var(--danger)">👎 不喜歡這個場景的設計</strong> — 鍵盤 <strong>D</strong><br>
+            可在影片下方的時間軸上看到標注點，按 <strong>×</strong> 刪除誤標。
+          </div>
+          <span class="tut-hint">⌨ L = 喜歡　D = 不喜歡　（影片播放中有效）</span>
         </div>
       </div>
+
       <div class="tut-card">
-        <div class="tut-icon-wrap blue" style="font-size:18px">⏱</div>
+        <div class="tut-icon-wrap blue" style="font-size:20px">📝</div>
         <div class="tut-body">
-          <div class="tut-title">觀看時長要求</div>
-          <div class="tut-desc">頂部進度條顯示累積觀看時間，需達到 <strong>20 秒</strong>才能提交問卷。累積觀看，不需連續。進度條變綠色即達標。</div>
-          <span class="tut-hint">💡 8 部影片，每部各自計時</span>
+          <div class="tut-title">問卷填寫（進度達標後解鎖）</div>
+          <div class="tut-desc">
+            問卷解鎖後，向下捲動依序完成四個部分：<br>
+            ① <strong>空間照明</strong>：此空間的照明方式（A 自然 / B 人工 / C 並用）<br>
+            ② <strong>風格判斷</strong>：猜測設計風格 + 信心程度<br>
+            ③ <strong>空間描述</strong>：自由描述感受，至少 20 字，可用麥克風語音輸入（不錄製音檔）<br>
+            ④ <strong>量表評分</strong>：15 題 7 點量表，點選數字即可
+          </div>
+          <span class="tut-hint">💡 未填欄位會標示紅框，並顯示「還差：XXX」</span>
         </div>
       </div>
+
       <div class="tut-card">
-        <div class="tut-icon-wrap green" style="font-size:18px">💾</div>
+        <div class="tut-icon-wrap green" style="font-size:20px">⏸</div>
         <div class="tut-body">
-          <div class="tut-title">資料自動儲存</div>
-          <div class="tut-desc">每部影片提交後資料即時備份。若意外重整頁面，系統會<strong>自動恢復進度</strong>，跳回最後一部未完成的影片，已完成的不需重做。</div>
-          <span class="tut-hint">💡 完成後請記下完成碼申請受試費</span>
+          <div class="tut-title">休息與進度</div>
+          <div class="tut-desc">
+            共 <strong>8 部影片</strong>，每部各自計時，互不影響。<br>
+            每完成 <strong>2 部</strong>後會出現短暫休息畫面（約 8 秒），可點按鈕提前繼續。<br>
+            若不小心重整頁面，系統會<strong>自動恢復進度</strong>，已完成的不需重做。
+          </div>
+          <span class="tut-hint">💡 完成後請記下完成碼，憑此申請受試費</span>
         </div>
       </div>
+
     </div>
-  </div>
+    </div>
 
   <div class="btn-row">
+
     <button class="btn btn-ghost" onclick="goTo('background')">← 返回</button>
     <button class="btn btn-primary" onclick="goTo('practice');loadPracticeVideo()">開始練習 →</button>
   </div>
@@ -673,7 +929,7 @@ textarea.field-error{outline:2px solid var(--danger)!important}
       <div class="watch-bar-wrap"><div class="watch-bar-fill" id="prac-watch-bar"></div></div>
     </div>
     <div style="margin-left:auto">
-      <button class="btn-sm btn-sm-primary" id="practice-next-btn" onclick="finishPractice()" disabled>完成練習，開始實驗 →</button>
+      <button class="btn-sm btn-sm-primary" id="prac-finish-topbar" style="display:none" onclick="validateAndFinishPractice()">完成練習 →</button>
     </div>
   </div>
   <!-- task bar -->
@@ -699,6 +955,7 @@ textarea.field-error{outline:2px solid var(--danger)!important}
       <button class="ctrl-icon-btn" onclick="skipPrac(-5)"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg></button>
       <button class="ctrl-icon-btn" onclick="skipPrac(5)"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg></button>
       <span class="ctrl-time" id="prac-time">0:00 / 0:00</span>
+      <span style="margin-left:10px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--ink4)">Space = 播放／暫停</span>
     </div>
     <!-- scrubber -->
     <div class="scrubber-row">
@@ -711,12 +968,10 @@ textarea.field-error{outline:2px solid var(--danger)!important}
     </div>
     <!-- annotation -->
     <div class="section-block">
-      <div class="section-block-title">即時標注 <span style="color:var(--ink4);font-size:9px;font-weight:400">Space = 播放／暫停　Q / E / Z / C = 標注</span></div>
+      <div class="section-block-title">即時標注 <span style="color:var(--ink4);font-size:9px;font-weight:400">Space = 播放／暫停　D = 不喜歡　L = 喜歡</span></div>
       <div class="tag-btn-grid" style="margin-bottom:8px">
-        <button class="tag-btn tag-like"    onclick="pracMarkTag('like_design')"    id="prac-btn-like"><span class="tag-key">Q</span>👍 喜歡這邊的設計</button>
-        <button class="tag-btn tag-dislike" onclick="pracMarkTag('dislike_design')" id="prac-btn-dislike"><span class="tag-key">E</span>👎 不喜歡這邊的設計</button>
-        <button class="tag-btn tag-good"    onclick="pracMarkTag('design_good')"    id="prac-btn-good"><span class="tag-key">Z</span>✅ 這邊設計的好</button>
-        <button class="tag-btn tag-bad"     onclick="pracMarkTag('design_bad')"     id="prac-btn-bad"><span class="tag-key">C</span>❌ 這邊設計的不好</button>
+        <button class="tag-btn tag-dislike" onclick="pracMarkTag('dislike_scene')" id="prac-btn-dislike"><span class="tag-key">D</span>👎 不喜歡這個場景的設計</button>
+        <button class="tag-btn tag-like"    onclick="pracMarkTag('like_scene')"    id="prac-btn-like"><span class="tag-key">L</span>👍 喜歡這個場景的設計</button>
       </div>
       <div class="ann-list2" id="prac-ann-list"></div>
     </div>
@@ -732,18 +987,18 @@ textarea.field-error{outline:2px solid var(--danger)!important}
           <div class="prac-step-num active" id="pstep-num-0">1</div>
           <div class="prac-step-body">
             <div class="prac-step-title">播放練習影片</div>
-            <div class="prac-step-desc">按下影片下方的 ▶ 播放鍵，或按鍵盤 <strong>Space</strong> 開始播放。影片是一段約 80 秒的建築空間漫遊。
+            <div class="prac-step-desc">影片<strong>不會自動播放</strong>。請按下方控制列的 ▶ 播放鍵，或按鍵盤 <strong>Space</strong> 開始；Space 再按一次暫停。
               <div class="prac-step-anim"><span class="prac-key-demo" id="pkd-space">Space</span></div>
             </div>
-            <span class="prac-step-tip">💡 影片播放後即開始計算觀看時間</span>
+            <span class="prac-step-tip">💡 開始播放後即計算觀看時間</span>
           </div>
         </div>
         <div class="prac-step-row" id="pstep-1">
           <div class="prac-step-num pending" id="pstep-num-1">2</div>
           <div class="prac-step-body">
             <div class="prac-step-title">即時標注感受</div>
-            <div class="prac-step-desc">觀看時，按下四個按鈕之一記錄當下反應。建議多標記幾次，捕捉不同時間點的感受。
-              <div class="prac-step-anim"><span class="prac-key-demo" id="pkd-q">Q</span><span class="prac-key-demo" id="pkd-e">E</span><span class="prac-key-demo" id="pkd-z">Z</span><span class="prac-key-demo" id="pkd-c">C</span></div>
+            <div class="prac-step-desc">觀看時，看到有感受的畫面立即按標注按鈕，或用鍵盤 L / D 快速標記。可標注多次，記錄不同時間點的感受，按 × 刪除誤標。
+              <div class="prac-step-anim"><span class="prac-key-demo" id="pkd-l">L</span><span class="prac-key-demo" id="pkd-d">D</span></div>
             </div>
             <span class="prac-step-tip">💡 反應直覺就好，不需要想太多</span>
           </div>
@@ -751,33 +1006,39 @@ textarea.field-error{outline:2px solid var(--danger)!important}
         <div class="prac-step-row" id="pstep-2">
           <div class="prac-step-num pending" id="pstep-num-2">3</div>
           <div class="prac-step-body">
-            <div class="prac-step-title">觀看滿 20 秒，解鎖問卷</div>
-            <div class="prac-step-desc">頂部進度條顯示累積觀看秒數，達到 20 秒後問卷區塊自動解鎖。可以快轉，但需要實際觀看到。</div>
+            <div class="prac-step-title">觀看達標，問卷自動解鎖</div>
+            <div class="prac-step-desc">頂部進度條顯示「還需觀看 Xs」，累積觀看達標後顯示「✓ 觀看達標」，問卷自動展開在下方。累積計算，不需連續。</div>
             <span class="prac-step-tip green">✓ 達標後問卷會出現在下方</span>
           </div>
         </div>
         <div class="prac-step-row" id="pstep-3">
           <div class="prac-step-num pending" id="pstep-num-3">4</div>
           <div class="prac-step-body">
-            <div class="prac-step-title">完成問卷</div>
-            <div class="prac-step-desc">填寫風格判斷、信心程度、空間描述（至少 20 字），以及所有量表評分後按「儲存量表」。全部完成即可進入正式實驗。</div>
+            <div class="prac-step-title">填寫問卷（四個部分）</div>
+            <div class="prac-step-desc">向下捲動依序填完四個部分：照明方式、風格判斷、空間描述（至少 20 字，可語音輸入）、15 題量表。全部完成後按底部「儲存並繼續下一部 →」即可進入正式實驗。</div>
             <span class="prac-step-tip">💡 正式實驗流程完全相同</span>
           </div>
         </div>
       </div>
     </div>
     <!-- hint before 20s -->
-    <div class="quest-unlock-hint" id="prac-unlock-hint">觀看滿 20 秒後解鎖問卷 ↓</div>
+    <div class="quest-unlock-hint" id="prac-unlock-hint">觀看滿影片長度 65% 後解鎖問卷 ↓</div>
     <!-- questionnaire (unlocks after 20s) -->
     <div class="quest-section" id="prac-quest-section">
+      <!-- re-watch hint -->
+      <div style="padding:4px 16px 0">
+        <div style="font-size:11px;color:var(--accent);font-family:'IBM Plex Mono',monospace;padding:8px 12px;background:var(--accent-l);border:1px solid rgba(45,90,61,.2);border-radius:var(--r2)">
+          💡 如需重看影片，可隨時按上方 ▶ 播放鍵或 Space 鍵回放，暫停後繼續作答
+        </div>
+      </div>
       <!-- style guess -->
       <div class="section-block" style="margin-top:0;margin-bottom:10px">
         <div class="section-block-title">🏛 風格判斷（練習）</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-          <div class="style-card" onclick="selPracStyle('MODN',this)"><div class="style-card-code">MODN</div><div class="style-card-name">現代簡約</div></div>
-          <div class="style-card" onclick="selPracStyle('MUJI',this)"><div class="style-card-code">MUJI</div><div class="style-card-name">無印自然</div></div>
-          <div class="style-card" onclick="selPracStyle('SCAN',this)"><div class="style-card-code">SCAN</div><div class="style-card-name">北歐風格</div></div>
-          <div class="style-card" onclick="selPracStyle('WABI',this)"><div class="style-card-code">WABI</div><div class="style-card-name">侘寂美學</div></div>
+        <div id="prac-style-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div class="style-card" onclick="selPracStyle('MODN',this)"><div class="style-card-code">MODN</div><div class="style-card-name">現代風</div></div>
+          <div class="style-card" onclick="selPracStyle('MUJI',this)"><div class="style-card-code">MUJI</div><div class="style-card-name">無印風</div></div>
+          <div class="style-card" onclick="selPracStyle('SCAN',this)"><div class="style-card-code">SCAN</div><div class="style-card-name">北歐風</div></div>
+          <div class="style-card" onclick="selPracStyle('WABI',this)"><div class="style-card-code">WABI</div><div class="style-card-name">侘寂風</div></div>
         </div>
         <div class="label-xs" style="margin-bottom:8px">信心程度</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap" id="prac-conf-row">
@@ -791,14 +1052,34 @@ textarea.field-error{outline:2px solid var(--danger)!important}
       <!-- description -->
       <div class="section-block" style="margin-top:0;margin-bottom:10px">
         <div class="section-block-title">✏ 空間描述（練習）</div>
-        <textarea class="desc-ta" id="prac-desc-ta" placeholder="請描述這個空間的氛圍、感受...（至少20字）" oninput="onPracDescInput()" style="width:100%;min-height:80px"></textarea>
-        <div style="text-align:right;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--ink4);margin-top:4px" id="prac-desc-count">0 字</div>
+        <div style="position:relative">
+          <textarea class="desc-ta" id="prac-desc-ta" placeholder="請描述這個空間的氛圍、感受...（至少20字）" oninput="onPracDescInput()" style="width:100%;min-height:80px"></textarea>
+          <span id="prac-desc-count" style="position:absolute;bottom:10px;right:12px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--ink4)">0 字</span>
+        </div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:10px">
+          <button id="prac-voice-btn"
+            onmousedown="startPracSpeech()" onmouseup="stopPracSpeech()" ontouchstart="startPracSpeech(event)" ontouchend="stopPracSpeech()"
+            style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--r2);border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:13px;font-weight:500;color:var(--ink2);font-family:inherit;transition:all .13s;user-select:none;-webkit-user-select:none">
+            <span id="prac-voice-icon">🎙</span>
+            <span id="prac-voice-btn-label">按住說話</span>
+          </button>
+          <span id="prac-voice-status" style="font-size:11px;color:var(--ink3);font-family:'IBM Plex Mono',monospace"></span>
+        </div>
+        <div style="font-size:10px;color:var(--ink4);font-family:'IBM Plex Mono',monospace;margin-top:6px;line-height:1.6">
+          可直接打字輸入，或按住「按住說話」使用語音輸入。<br>語音輸入僅即時辨識為文字，<strong>不錄製或儲存任何音檔</strong>。
+        </div>
       </div>
       <!-- scales -->
       <div class="section-block" style="margin-top:0;margin-bottom:10px">
         <div class="section-block-title">📊 量表評分（練習）</div>
         <div id="prac-scale-items"></div>
-        <button class="export-btn" onclick="pracSaveScale()"><span>💾</span>儲存量表評分</button>
+      </div>
+      <!-- validation hint + finish button — matches main experiment layout -->
+      <div style="padding:0 16px 20px">
+        <div id="prac-validation-hint" style="display:none;font-size:11px;color:var(--danger);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;padding:8px 12px;background:var(--danger-l);border-radius:var(--r);border:1px solid rgba(139,32,32,.2)"></div>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-primary" id="practice-next-btn" onclick="validateAndFinishPractice()">完成練習，開始實驗 →</button>
+        </div>
       </div>
     </div>
   </div>
@@ -809,7 +1090,7 @@ textarea.field-error{outline:2px solid var(--danger)!important}
 <div class="screen" id="app-screen">
 <div class="exp-wrap">
   <!-- topbar -->
-  <div class="exp-topbar">
+  <div class="exp-topbar-row"><div class="exp-topbar">
     <div class="topbar-brand"><span class="topbar-brand-a">Arch</span><span class="topbar-brand-b">Sense</span></div>
     <div class="topbar-div"></div>
     <div class="topbar-pid mono" id="topbar-pid">—</div>
@@ -822,9 +1103,10 @@ textarea.field-error{outline:2px solid var(--danger)!important}
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink3)" id="topbar-video-info">影片 1 / 8</span>
       <button class="btn-sm btn-sm-primary" id="next-video-btn" onclick="goToPostVideo()" disabled>完成此部，填寫問卷 →</button>
     </div>
-  </div>
+  </div></div>
   <!-- content -->
   <div class="exp-content">
+    <div class="video-sticky-block">
     <!-- video -->
     <div class="video-wrap" id="video-stage">
       <video id="main-video"></video>
@@ -842,6 +1124,7 @@ textarea.field-error{outline:2px solid var(--danger)!important}
       <button class="ctrl-icon-btn" onclick="skipTime(-5)"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg></button>
       <button class="ctrl-icon-btn" onclick="skipTime(5)"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg></button>
       <span class="ctrl-time" id="ctrl-time">0:00 / 0:00</span>
+      <span style="margin-left:10px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--ink4)">Space = 播放／暫停</span>
     </div>
     <!-- scrubber -->
     <div class="scrubber-row">
@@ -853,29 +1136,36 @@ textarea.field-error{outline:2px solid var(--danger)!important}
       </div>
       <div class="mark-track2" id="ann-track"><div class="mark-track-label label-xs">MARKS</div></div>
     </div>
+    </div><!-- end video-sticky-block -->
+    <!-- layout: quest-scroll-block starts here -->
+    <div class="quest-scroll-block">
     <!-- annotation -->
     <div class="section-block">
-      <div class="section-block-title">即時標注 <span style="color:var(--ink4);font-size:9px;font-weight:400">Space = 播放／暫停　Q / E / Z / C = 標注</span></div>
+      <div class="section-block-title">即時標注 <span style="color:var(--ink4);font-size:9px;font-weight:400">Space = 播放／暫停　D = 不喜歡　L = 喜歡</span></div>
       <div class="tag-btn-grid" style="margin-bottom:8px">
-        <button class="tag-btn tag-like"    onclick="markTag('like_design')"    id="main-btn-like"><span class="tag-key">Q</span>👍 喜歡這邊的設計</button>
-        <button class="tag-btn tag-dislike" onclick="markTag('dislike_design')" id="main-btn-dislike"><span class="tag-key">E</span>👎 不喜歡這邊的設計</button>
-        <button class="tag-btn tag-good"    onclick="markTag('design_good')"    id="main-btn-good"><span class="tag-key">Z</span>✅ 這邊設計的好</button>
-        <button class="tag-btn tag-bad"     onclick="markTag('design_bad')"     id="main-btn-bad"><span class="tag-key">C</span>❌ 這邊設計的不好</button>
+        <button class="tag-btn tag-dislike" onclick="markTag('dislike_scene')" id="main-btn-dislike"><span class="tag-key">D</span>👎 不喜歡這個場景的設計</button>
+        <button class="tag-btn tag-like"    onclick="markTag('like_scene')"    id="main-btn-like"><span class="tag-key">L</span>👍 喜歡這個場景的設計</button>
       </div>
       <div class="ann-list2" id="ann-list"></div>
     </div>
     <!-- unlock hint -->
-    <div class="quest-unlock-hint" id="quest-unlock-hint">觀看滿 20 秒後解鎖問卷 ↓</div>
+    <div class="quest-unlock-hint" id="quest-unlock-hint">觀看滿影片長度 65% 後解鎖問卷 ↓</div>
     <!-- questionnaire -->
     <div class="quest-section" id="quest-section">
+      <!-- re-watch hint -->
+      <div style="padding:4px 16px 0">
+        <div style="font-size:11px;color:var(--accent);font-family:'IBM Plex Mono',monospace;padding:8px 12px;background:var(--accent-l);border:1px solid rgba(45,90,61,.2);border-radius:var(--r2)">
+          💡 如需重看影片，可隨時按上方 ▶ 播放鍵或 Space 鍵回放，暫停後繼續作答
+        </div>
+      </div>
       <!-- style guess -->
       <div class="section-block" style="margin-top:0;margin-bottom:10px">
         <div class="section-block-title">🏛 風格判斷</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-          <div class="style-card" onclick="selStyle('MODN',this)"><div class="style-card-code">MODN</div><div class="style-card-name">現代簡約</div><div class="style-card-desc">俐落線條、中性色調</div></div>
-          <div class="style-card" onclick="selStyle('MUJI',this)"><div class="style-card-code">MUJI</div><div class="style-card-name">無印自然</div><div class="style-card-desc">木質調、米白色</div></div>
-          <div class="style-card" onclick="selStyle('SCAN',this)"><div class="style-card-code">SCAN</div><div class="style-card-name">北歐風格</div><div class="style-card-desc">明亮採光、幾何元素</div></div>
-          <div class="style-card" onclick="selStyle('WABI',this)"><div class="style-card-code">WABI</div><div class="style-card-name">侘寂美學</div><div class="style-card-desc">不完美感、自然風化</div></div>
+        <div id="main-style-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div class="style-card" onclick="selStyle('MODN',this)"><div class="style-card-code">MODN</div><div class="style-card-name">現代風</div></div>
+          <div class="style-card" onclick="selStyle('MUJI',this)"><div class="style-card-code">MUJI</div><div class="style-card-name">無印風</div></div>
+          <div class="style-card" onclick="selStyle('SCAN',this)"><div class="style-card-code">SCAN</div><div class="style-card-name">北歐風</div></div>
+          <div class="style-card" onclick="selStyle('WABI',this)"><div class="style-card-code">WABI</div><div class="style-card-name">侘寂風</div></div>
         </div>
         <div class="label-xs" style="margin-bottom:8px">信心程度</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap" id="conf-row">
@@ -893,19 +1183,73 @@ textarea.field-error{outline:2px solid var(--danger)!important}
           <textarea id="desc-ta" class="desc-ta" style="width:100%;min-height:88px" placeholder="請描述這個空間的氛圍、光線、材質、或給您的感受...（至少20字）" oninput="onDescInput()"></textarea>
           <span id="desc-count" style="position:absolute;bottom:10px;right:12px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--ink4)">0 字</span>
         </div>
-        <button id="voice-btn" onclick="toggleVoice()" style="margin-top:8px;display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:var(--r2);border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:12px;color:var(--ink2);font-family:inherit">🎙 語音輸入（可選）</button>
-        <div id="voice-status" style="font-size:11px;color:var(--ink3);font-family:'IBM Plex Mono',monospace;margin-top:6px;min-height:16px"></div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:10px">
+          <button id="voice-btn"
+            onmousedown="startSpeech()" onmouseup="stopSpeech()" ontouchstart="startSpeech(event)" ontouchend="stopSpeech()"
+            style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--r2);border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:13px;font-weight:500;color:var(--ink2);font-family:inherit;transition:all .13s;user-select:none;-webkit-user-select:none">
+            <span id="voice-icon">🎙</span>
+            <span id="voice-btn-label">按住說話</span>
+          </button>
+          <span id="voice-status" style="font-size:11px;color:var(--ink3);font-family:'IBM Plex Mono',monospace;min-height:16px"></span>
+        </div>
+        <div id="speech-support-hint" style="display:none;font-size:10px;color:var(--ink4);font-family:'IBM Plex Mono',monospace;margin-top:5px">⚠ 此瀏覽器不支援語音輸入，請直接打字</div>
       </div>
       <!-- scales -->
       <div class="section-block" style="margin-top:0;margin-bottom:10px">
         <div class="section-block-title">📊 量表評分</div>
         <div id="post-scale-container"></div>
+        <!-- lighting attention check — 接在光線兩題之後 -->
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)" id="lighting-section">
+          <div style="margin-bottom:12px;padding:10px 14px;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 var(--r2) var(--r2) 0">
+            <div style="font-size:14px;font-weight:500;color:var(--ink)">根據剛才觀看的影片，此空間的主要照明方式為？</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px" id="lighting-opts">
+            <div class="style-card" onclick="selLighting('A',this)" style="text-align:left;padding:10px 14px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink4)">A</span>
+              <span style="margin-left:8px;font-size:13px">以自然採光為主（窗戶、天窗）</span>
+            </div>
+            <div class="style-card" onclick="selLighting('B',this)" style="text-align:left;padding:10px 14px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink4)">B</span>
+              <span style="margin-left:8px;font-size:13px">以人工照明為主（燈具、嵌燈）</span>
+            </div>
+            <div class="style-card" onclick="selLighting('C',this)" style="text-align:left;padding:10px 14px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink4)">C</span>
+              <span style="margin-left:8px;font-size:13px">自然與人工照明並用</span>
+            </div>
+          </div>
+        </div>
       </div>
       <!-- submit -->
-      <div style="padding:0 16px 20px;display:flex;justify-content:flex-end">
-        <button class="btn btn-primary" id="next-video-btn2" onclick="validateAndSubmit()">儲存並繼續下一部 →</button>
+      <div style="padding:0 16px 20px">
+        <div id="validation-hint" style="display:none;font-size:11px;color:var(--danger);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;padding:8px 12px;background:var(--danger-l);border-radius:var(--r);border:1px solid rgba(139,32,32,.2)"></div>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-primary" id="next-video-btn2" onclick="validateAndSubmit()">儲存並繼續下一部 →</button>
+        </div>
       </div>
     </div>
+  </div>
+    </div><!-- end quest-scroll-block -->
+</div>
+</div>
+
+<!-- SCREEN: REST (每2部影片後) -->
+<div class="screen" id="screen-rest">
+<div class="exp-wrap" style="align-items:center;justify-content:center;min-height:100vh;background:var(--bg)">
+  <div style="text-align:center;max-width:480px;padding:40px 24px">
+    <div style="font-size:48px;margin-bottom:16px">☕</div>
+    <div style="font-size:22px;font-weight:600;color:var(--ink);margin-bottom:8px" id="rest-title">稍作休息</div>
+    <div style="font-size:14px;color:var(--ink2);margin-bottom:4px" id="rest-subtitle">已完成 <strong id="rest-done">2</strong> / <strong id="rest-total">8</strong> 部影片</div>
+    <div style="font-size:12px;color:var(--ink3);margin-bottom:32px">幾秒後自動繼續，或點下方按鈕立即開始</div>
+    <!-- countdown ring -->
+    <div style="position:relative;width:100px;height:100px;margin:0 auto 28px">
+      <svg width="100" height="100" viewBox="0 0 100 100" style="transform:rotate(-90deg)">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--bg3)" stroke-width="8"/>
+        <circle id="rest-ring" cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="8"
+          stroke-dasharray="263.9" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;color:var(--accent)" id="rest-count">8</div>
+    </div>
+    <button class="btn btn-primary" onclick="endRest()" style="padding:12px 32px;font-size:14px">繼續實驗 →</button>
   </div>
 </div>
 </div>
@@ -972,8 +1316,8 @@ textarea.field-error{outline:2px solid var(--danger)!important}
 /* ════ CONFIG ════ */
 const RESEARCH_EMAIL   = 'projectana.nthu.hmilab.tw@gmail.com';
 const RESEARCH_EMAIL_PI = 'kuopc@cs.nthu.edu.tw';
-const RESEARCH_EMAIL2  = 'yangchenlin@gapp.nthu.edu.tw';
-const SHEETS_URL       = 'https://script.google.com/macros/s/AKfycbw7ZZO3SU7A9rIuuIs4UJhmvmNf83CJMDVt1F9LGVICk9oWUBlRIAURjJwWksWPOT8c6Q/exec';
+const RESEARCH_EMAIL2  = 'projectana.nthu.hmilab.tw@gmail.com';
+const SHEETS_URL       = 'https://script.google.com/macros/s/AKfycbxcP_2jAT6nljYuBzBpXvR98x-WBn0WRIt_Mlp_f6pA-d8kkX08LXk3ew4SADjyhrKdag/exec';
 const GAS_TOKEN        = 'as2025nthu';
 const R2_BASE          = 'https://pub-d1170515a6a547b0a0b191a7fe809b1e.r2.dev';
 const PRACTICE_VIDEO   = R2_BASE + '/EGVideo_SPACE_05_MODN.mp4';
@@ -985,40 +1329,82 @@ const WATCH_THRESHOLD_PCT = 0.65;
    測試差異：影片數 8→3，觀看門檻 65%→10%，資料標記 DEV-
    ──────────────────────────────────────────────────────────────────────── */
 const DEV_MODE = (new URLSearchParams(location.search).get('dev')==='1') || false;
+const LAYOUT_VARIANT = (new URLSearchParams(location.search).get('layout')||'A').toUpperCase();
+// Apply layout class to body immediately
+if(LAYOUT_VARIANT!=='A') document.body.classList.add('layout-'+LAYOUT_VARIANT.toLowerCase());
+// Show layout badge (always visible for orientation)
+document.addEventListener('DOMContentLoaded',function(){
+  var badge=document.getElementById('layout-badge');
+  if(badge){ badge.textContent='Layout '+LAYOUT_VARIANT; badge.style.display=''; }
+});
 
 const VIDEOS_PER_SESS  = DEV_MODE ? 3 : 8;
 const STYLES           = ['MODN','MUJI','SCAN','WABI'];
 // MIN_WATCH_SEC 依影片實際長度動態計算，見 loadExperimentVideo
+// 照明 Attention Check 答案（看完影片後確認）
+// A = 以自然採光為主  B = 以人工照明為主  C = 自然與人工並用
+const LIGHTING_ANSWERS = {
+  'EGVideo_SPACE_05_MODN': 'PLACEHOLDER',
+  'EGVideo_SPACE_05_MUJI': 'PLACEHOLDER',
+  'EGVideo_SPACE_05_SCAN': 'PLACEHOLDER',
+  'EGVideo_SPACE_05_WABI': 'PLACEHOLDER',
+  'EGVideo_SPACE_06_MODN': 'PLACEHOLDER',
+  'EGVideo_SPACE_06_SCAN': 'PLACEHOLDER',
+  'EGVideo_SPACE_06_WABI': 'PLACEHOLDER',
+  'EGVideo_SPACE_07_MODN': 'PLACEHOLDER',
+  'EGVideo_SPACE_07_MUJI': 'PLACEHOLDER',
+  'EGVideo_SPACE_07_SCAN': 'PLACEHOLDER',
+  'EGVideo_SPACE_07_WABI': 'PLACEHOLDER',
+  'EGVideo_SPACE_08_MODN': 'PLACEHOLDER',
+  'EGVideo_SPACE_08_MUJI': 'PLACEHOLDER',
+  'EGVideo_SPACE_08_SCAN': 'PLACEHOLDER',
+  'EGVideo_SPACE_08_WABI': 'PLACEHOLDER',
+};
+
 const AVAILABLE_VIDEOS = [
-  'EGVideo_SPACE_05_MODN','EGVideo_SPACE_05_MUJI','EGVideo_SPACE_05_SCAN','EGVideo_SPACE_05_WABI',
   'EGVideo_SPACE_06_MODN','EGVideo_SPACE_06_SCAN','EGVideo_SPACE_06_WABI',
   'EGVideo_SPACE_07_MODN','EGVideo_SPACE_07_MUJI','EGVideo_SPACE_07_SCAN','EGVideo_SPACE_07_WABI',
   'EGVideo_SPACE_08_MODN','EGVideo_SPACE_08_MUJI','EGVideo_SPACE_08_SCAN','EGVideo_SPACE_08_WABI',
 ];
+// SCALES 結構依據 Coburn et al. (2020) Cortex 三段式引導語框架
+// prompt 欄位用於問卷群組標題，對應論文的 "This room looks / makes me feel / I'd..."
 const SCALES = [
-  {group:'光線感知',items:[
-    {key:'lightColor',  label:'內部光線色調', lo:'冷色調', hi:'暖色調',  max:7},
-    {key:'lightComfort',label:'光線舒適度',   lo:'不舒適', hi:'舒適',    max:5},
-  ]},
-  {group:'探索意願',items:[
-    {key:'exploreWant', label:'探索意願',     lo:'不想探索',hi:'想探索', max:7},
-    {key:'enterWant',   label:'進入意願',     lo:'不想進入',hi:'想進入', max:7},
-  ]},
-  {group:'情感感受',items:[
-    {key:'inspired',    label:'鼓舞感',  lo:'沮喪的',  hi:'鼓舞的',  max:7},
-    {key:'belonging',   label:'歸屬感',  lo:'無法融入',hi:'有歸屬感',max:7},
-    {key:'relaxed',     label:'放鬆感',  lo:'有壓力的',hi:'放鬆的',  max:7},
-    {key:'comfortable', label:'舒適感',  lo:'不舒適',  hi:'舒適',    max:7},
-    {key:'lively',      label:'活力感',  lo:'毫無生氣',hi:'有活力的',max:7},
-    {key:'interesting1',label:'有趣感',  lo:'無趣',    hi:'有趣',    max:7},
-    {key:'positive',    label:'正面感',  lo:'負面的',  hi:'正面的',  max:7},
-  ]},
-  {group:'空間評估',items:[
-    {key:'interesting2',label:'視覺趣味',lo:'無聊',   hi:'有趣',    max:7},
-    {key:'natural',     label:'自然感',  lo:'人造的', hi:'自然的',  max:7},
-    {key:'ordered',     label:'秩序感',  lo:'失序的', hi:'井然有序',max:7},
-    {key:'complex',     label:'複雜度',  lo:'簡單',   hi:'複雜',    max:7},
-  ]},
+  {
+    group:'這個空間看起來…',
+    prompt:'這個空間看起來…',
+    coburn:'視覺評估 Visual Assessment',
+    items:[
+      {key:'complex',     label:'複雜度',     lo:'簡單',    hi:'複雜',     max:7},
+      {key:'ordered',     label:'秩序感',     lo:'失序的',  hi:'井然有序', max:7},
+      {key:'natural',     label:'自然感',     lo:'人造的',  hi:'自然的',   max:7},
+      {key:'beauty',      label:'美感',       lo:'醜陋的',  hi:'美麗的',   max:7},
+      {key:'lightColor',  label:'光線色調',   lo:'冷色調',  hi:'暖色調',   max:7},
+      {key:'lightComfort',label:'光線舒適度', lo:'刺眼不適',hi:'舒適宜人', max:7},
+    ]
+  },
+  {
+    group:'這個空間讓我感覺…',
+    prompt:'這個空間讓我感覺…',
+    coburn:'情感反應 Affective Response',
+    items:[
+      {key:'positive',    label:'整體感受',   lo:'負面的',  hi:'正面的',   max:7},
+      {key:'lively',      label:'活力感',     lo:'毫無生氣',hi:'有活力的', max:7},
+      {key:'relaxed',     label:'放鬆感',     lo:'有壓力的',hi:'放鬆的',   max:7},
+      {key:'oppressive',  label:'壓迫感',     lo:'完全沒有',hi:'非常強烈', max:7},
+      {key:'inspired',    label:'鼓舞感',     lo:'沮喪的',  hi:'鼓舞的',   max:7},
+      {key:'belonging',   label:'歸屬感',     lo:'無法融入',hi:'有歸屬感', max:7},
+      {key:'interest',    label:'有趣感',     lo:'無聊的',  hi:'有趣的',   max:7},
+    ]
+  },
+  {
+    group:'如果我到了這個空間，我會…',
+    prompt:'如果我到了這個空間，我會…',
+    coburn:'行為意圖 Behavioral Intention',
+    items:[
+      {key:'exploreWant', label:'探索意願',   lo:'不想探索',hi:'想探索',   max:7},
+      {key:'enterWant',   label:'進入意願',   lo:'想離開',  hi:'想進入',   max:7},
+    ]
+  },
 ];
 
 /* ════ VIDEO ASSIGNMENT ════ */
@@ -1035,12 +1421,135 @@ function assignVideos(seed){
 }
 
 /* ════ STATE ════ */
-const P={email:'',pid:'',participantCode:'',gender:'',age:'',archBg:null,consentTime:null};
-const bgSel={gender:null,age:null,arch:null};
-let assignedVideos=[],currentVideoIdx=0;
+const P={email:'',pid:'',participantCode:'',gender:'',age:'',archBg:null,consentTime:null,
+  currentZip:null,currentDistrict:null,birthZip:null,birthDistrict:null,
+  livedNordic:null,housingType:null,growupType:null,housingSize:null,
+  attentionCheckPass:null,livingWith:null,renovation:null};
+/* ════ ZIP CODE DB ════ */
+const ZIP_DB={"100":"台北市 中正區","103":"台北市 大同區","104":"台北市 中山區","105":"台北市 松山區","106":"台北市 大安區","108":"台北市 萬華區","110":"台北市 信義區","111":"台北市 士林區","112":"台北市 北投區","114":"台北市 內湖區","115":"台北市 南港區","116":"台北市 文山區","200":"基隆市 仁愛區","201":"基隆市 信義區","202":"基隆市 中正區","203":"基隆市 中山區","204":"基隆市 安樂區","205":"基隆市 暖暖區","206":"基隆市 七堵區","207":"新北市 萬里區","208":"新北市 金山區","220":"新北市 板橋區","221":"新北市 汐止區","222":"新北市 深坑區","223":"新北市 石碇區","224":"新北市 瑞芳區","226":"新北市 平溪區","227":"新北市 雙溪區","228":"新北市 貢寮區","231":"新北市 新店區","232":"新北市 坪林區","233":"新北市 烏來區","234":"新北市 永和區","235":"新北市 中和區","236":"新北市 土城區","237":"新北市 三峽區","238":"新北市 樹林區","239":"新北市 鶯歌區","241":"新北市 三重區","242":"新北市 新莊區","243":"新北市 泰山區","244":"新北市 林口區","247":"新北市 蘆洲區","248":"新北市 五股區","249":"新北市 八里區","251":"新北市 淡水區","260":"宜蘭縣 宜蘭市","261":"宜蘭縣 頭城鎮","262":"宜蘭縣 礁溪鄉","263":"宜蘭縣 壯圍鄉","264":"宜蘭縣 員山鄉","265":"宜蘭縣 羅東鎮","266":"宜蘭縣 三星鄉","267":"宜蘭縣 大同鄉","268":"宜蘭縣 五結鄉","269":"宜蘭縣 冬山鄉","270":"宜蘭縣 蘇澳鎮","272":"宜蘭縣 南澳鄉","300":"新竹市 東區","301":"新竹市 北區","302":"新竹縣 竹北市","303":"新竹縣 湖口鄉","304":"新竹縣 新豐鄉","305":"新竹縣 新埔鎮","306":"新竹縣 關西鎮","307":"新竹縣 芎林鄉","308":"新竹縣 寶山鄉","310":"新竹縣 竹東鎮","311":"新竹縣 五峰鄉","312":"新竹縣 橫山鄉","313":"新竹縣 尖石鄉","314":"新竹縣 北埔鄉","315":"新竹縣 峨眉鄉","320":"桃園市 中壢區","324":"桃園市 平鎮區","325":"桃園市 龍潭區","326":"桃園市 楊梅區","327":"桃園市 新屋區","328":"桃園市 觀音區","330":"桃園市 桃園區","333":"桃園市 龜山區","334":"桃園市 八德區","335":"桃園市 大溪區","336":"桃園市 復興區","337":"桃園市 大園區","338":"桃園市 蘆竹區","350":"苗栗縣 竹南鎮","351":"苗栗縣 頭份市","352":"苗栗縣 三灣鄉","353":"苗栗縣 南庄鄉","354":"苗栗縣 獅潭鄉","356":"苗栗縣 後龍鎮","357":"苗栗縣 通霄鎮","358":"苗栗縣 苑裡鎮","360":"苗栗縣 苗栗市","361":"苗栗縣 造橋鄉","362":"苗栗縣 頭屋鄉","363":"苗栗縣 公館鄉","364":"苗栗縣 大湖鄉","365":"苗栗縣 泰安鄉","366":"苗栗縣 銅鑼鄉","367":"苗栗縣 三義鄉","368":"苗栗縣 西湖鄉","369":"苗栗縣 卓蘭鎮","400":"台中市 中區","401":"台中市 東區","402":"台中市 南區","403":"台中市 西區","404":"台中市 北區","406":"台中市 北屯區","407":"台中市 西屯區","408":"台中市 南屯區","411":"台中市 太平區","412":"台中市 大里區","413":"台中市 霧峰區","414":"台中市 烏日區","420":"台中市 豐原區","421":"台中市 后里區","422":"台中市 石岡區","423":"台中市 東勢區","424":"台中市 和平區","426":"台中市 新社區","427":"台中市 潭子區","428":"台中市 大雅區","429":"台中市 神岡區","432":"台中市 大肚區","433":"台中市 沙鹿區","434":"台中市 龍井區","435":"台中市 梧棲區","436":"台中市 清水區","437":"台中市 大甲區","438":"台中市 外埔區","439":"台中市 大安區","500":"彰化縣 彰化市","502":"彰化縣 芬園鄉","503":"彰化縣 花壇鄉","504":"彰化縣 秀水鄉","505":"彰化縣 鹿港鎮","506":"彰化縣 福興鄉","507":"彰化縣 線西鄉","508":"彰化縣 和美鎮","509":"彰化縣 伸港鄉","510":"彰化縣 員林市","511":"彰化縣 社頭鄉","512":"彰化縣 永靖鄉","513":"彰化縣 埔心鄉","514":"彰化縣 溪湖鎮","515":"彰化縣 大村鄉","516":"彰化縣 埔鹽鄉","520":"彰化縣 田中鎮","521":"彰化縣 北斗鎮","522":"彰化縣 田尾鄉","523":"彰化縣 埤頭鄉","524":"彰化縣 溪州鄉","525":"彰化縣 竹塘鄉","526":"彰化縣 二林鎮","527":"彰化縣 大城鄉","528":"彰化縣 芳苑鄉","530":"彰化縣 二水鄉","540":"南投縣 南投市","541":"南投縣 中寮鄉","542":"南投縣 草屯鎮","544":"南投縣 國姓鄉","545":"南投縣 埔里鎮","546":"南投縣 仁愛鄉","551":"南投縣 名間鄉","552":"南投縣 集集鎮","553":"南投縣 水里鄉","555":"南投縣 魚池鄉","556":"南投縣 信義鄉","557":"南投縣 竹山鎮","558":"南投縣 鹿谷鄉","600":"嘉義市 西區","602":"嘉義市 東區","603":"嘉義縣 番路鄉","604":"嘉義縣 梅山鄉","605":"嘉義縣 竹崎鄉","606":"嘉義縣 阿里山鄉","607":"嘉義縣 中埔鄉","608":"嘉義縣 大埔鄉","611":"嘉義縣 水上鄉","612":"嘉義縣 鹿草鄉","613":"嘉義縣 太保市","614":"嘉義縣 朴子市","615":"嘉義縣 東石鄉","616":"嘉義縣 六腳鄉","617":"嘉義縣 新港鄉","621":"嘉義縣 民雄鄉","622":"嘉義縣 大林鎮","623":"嘉義縣 溪口鄉","624":"嘉義縣 義竹鄉","625":"嘉義縣 布袋鎮","630":"雲林縣 斗南鎮","631":"雲林縣 大埤鄉","632":"雲林縣 虎尾鎮","633":"雲林縣 土庫鎮","634":"雲林縣 褒忠鄉","635":"雲林縣 東勢鄉","636":"雲林縣 臺西鄉","637":"雲林縣 崙背鄉","638":"雲林縣 麥寮鄉","640":"雲林縣 斗六市","643":"雲林縣 林內鄉","646":"雲林縣 古坑鄉","647":"雲林縣 莿桐鄉","648":"雲林縣 西螺鎮","649":"雲林縣 二崙鄉","651":"雲林縣 北港鎮","652":"雲林縣 水林鄉","653":"雲林縣 口湖鄉","654":"雲林縣 四湖鄉","655":"雲林縣 元長鄉","700":"台南市 中西區","701":"台南市 東區","702":"台南市 南區","704":"台南市 北區","708":"台南市 安平區","709":"台南市 安南區","710":"台南市 永康區","711":"台南市 歸仁區","712":"台南市 新化區","713":"台南市 左鎮區","714":"台南市 玉井區","715":"台南市 楠西區","716":"台南市 南化區","717":"台南市 仁德區","718":"台南市 關廟區","719":"台南市 龍崎區","720":"台南市 官田區","721":"台南市 麻豆區","722":"台南市 佳里區","723":"台南市 西港區","724":"台南市 七股區","725":"台南市 將軍區","726":"台南市 學甲區","727":"台南市 北門區","730":"台南市 新營區","731":"台南市 後壁區","732":"台南市 白河區","733":"台南市 東山區","734":"台南市 六甲區","735":"台南市 下營區","736":"台南市 柳營區","737":"台南市 鹽水區","741":"台南市 善化區","742":"台南市 大內區","743":"台南市 山上區","744":"台南市 新市區","745":"台南市 安定區","800":"高雄市 新興區","801":"高雄市 前金區","802":"高雄市 苓雅區","803":"高雄市 鹽埕區","804":"高雄市 鼓山區","805":"高雄市 旗津區","806":"高雄市 前鎮區","807":"高雄市 三民區","811":"高雄市 楠梓區","812":"高雄市 小港區","813":"高雄市 左營區","814":"高雄市 仁武區","815":"高雄市 大社區","820":"高雄市 岡山區","821":"高雄市 路竹區","822":"高雄市 阿蓮區","823":"高雄市 田寮區","824":"高雄市 燕巢區","825":"高雄市 橋頭區","826":"高雄市 梓官區","827":"高雄市 彌陀區","828":"高雄市 永安區","829":"高雄市 湖內區","830":"高雄市 鳳山區","831":"高雄市 大寮區","832":"高雄市 林園區","833":"高雄市 鳥松區","840":"高雄市 大樹區","842":"高雄市 旗山區","843":"高雄市 美濃區","844":"高雄市 六龜區","845":"高雄市 內門區","846":"高雄市 杉林區","847":"高雄市 甲仙區","848":"高雄市 桃源區","849":"高雄市 那瑪夏區","851":"高雄市 茂林區","852":"高雄市 茄萣區","880":"澎湖縣 馬公市","881":"澎湖縣 西嶼鄉","882":"澎湖縣 望安鄉","883":"澎湖縣 七美鄉","884":"澎湖縣 白沙鄉","885":"澎湖縣 湖西鄉","890":"金門縣 金城鎮","891":"金門縣 金湖鎮","892":"金門縣 金沙鎮","893":"金門縣 金寧鄉","894":"金門縣 烈嶼鄉","896":"金門縣 烏坵鄉","900":"屏東縣 屏東市","901":"屏東縣 三地門鄉","902":"屏東縣 霧臺鄉","903":"屏東縣 瑪家鄉","904":"屏東縣 九如鄉","905":"屏東縣 里港鄉","906":"屏東縣 高樹鄉","907":"屏東縣 鹽埔鄉","908":"屏東縣 長治鄉","909":"屏東縣 麟洛鄉","911":"屏東縣 竹田鄉","912":"屏東縣 內埔鄉","913":"屏東縣 萬丹鄉","920":"屏東縣 潮州鎮","921":"屏東縣 泰武鄉","922":"屏東縣 來義鄉","923":"屏東縣 萬巒鄉","924":"屏東縣 崁頂鄉","925":"屏東縣 新埤鄉","926":"屏東縣 南州鄉","927":"屏東縣 林邊鄉","928":"屏東縣 東港鎮","929":"屏東縣 琉球鄉","931":"屏東縣 佳冬鄉","932":"屏東縣 新園鄉","940":"屏東縣 枋寮鄉","941":"屏東縣 枋山鄉","942":"屏東縣 春日鄉","943":"屏東縣 獅子鄉","944":"屏東縣 車城鄉","945":"屏東縣 牡丹鄉","946":"屏東縣 恆春鎮","947":"屏東縣 滿州鄉","950":"台東縣 台東市","951":"台東縣 綠島鄉","952":"台東縣 蘭嶼鄉","953":"台東縣 延平鄉","954":"台東縣 卑南鄉","955":"台東縣 鹿野鄉","956":"台東縣 關山鎮","957":"台東縣 海端鄉","958":"台東縣 池上鄉","959":"台東縣 東河鄉","961":"台東縣 成功鎮","962":"台東縣 長濱鄉","963":"台東縣 太麻里鄉","964":"台東縣 金峰鄉","965":"台東縣 大武鄉","966":"台東縣 達仁鄉","970":"花蓮縣 花蓮市","971":"花蓮縣 新城鄉","972":"花蓮縣 秀林鄉","973":"花蓮縣 吉安鄉","974":"花蓮縣 壽豐鄉","975":"花蓮縣 鳳林鎮","976":"花蓮縣 光復鄉","977":"花蓮縣 豐濱鄉","978":"花蓮縣 瑞穗鄉","979":"花蓮縣 萬榮鄉","981":"花蓮縣 玉里鎮","982":"花蓮縣 卓溪鄉","983":"花蓮縣 富里鄉","000":"台灣以外"};
+
+/* ════ BACKGROUND ════ */
+const bgSel={gender:null,age:null,arch:null,
+  currentZip:null,currentDistrict:null,
+  birthZip:null,birthDistrict:null,
+  livedNordic:null,housingType:null,growupType:null,
+  housingSize:null,attnCheck:null,livingWith:null,renovation:null};
+
+function onZipInput(type){
+  const el=document.getElementById('zip-'+type);
+  const lbl=document.getElementById('zip-'+type+'-label');
+  const err=document.getElementById('zip-'+type+'-err');
+  const z=el.value.trim();
+  if(z.length===3){
+    const loc=(z==='000')?'台灣以外':ZIP_DB[z];
+    if(loc){
+      lbl.textContent='✓ '+loc;lbl.style.color='var(--accent)';err.style.display='none';
+      bgSel[type+'Zip']=z;bgSel[type+'District']=loc;
+    } else {
+      lbl.textContent='—';lbl.style.color='var(--ink3)';err.style.display='block';
+      bgSel[type+'Zip']=null;bgSel[type+'District']=null;
+    }
+  } else {
+    lbl.textContent='—';lbl.style.color='var(--ink3)';err.style.display='none';
+    bgSel[type+'Zip']=null;bgSel[type+'District']=null;
+  }
+  checkBg();
+}
+// explicit grid ID map — HTML id attributes use short names, grp keys use camelCase
+const GRID_ID_MAP={
+  gender:'gender',livedNordic:'nordic',housingType:'housing',
+  growupType:'growup',housingSize:'size',attnCheck:'attn',
+  livingWith:'living',renovation:'renov'
+};
+function selRadio(grp,val,el){
+  const baseId=GRID_ID_MAP[grp]||grp;
+  const g=document.getElementById(baseId+'-grid')||el.parentElement;
+  g.querySelectorAll('.radio-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');bgSel[grp]=val;checkBg();
+}
+function selYN(val){bgSel.arch=val;document.getElementById('arch-yes').classList.toggle('sel',val===true);document.getElementById('arch-no').classList.toggle('sel',val===false);checkBg();}
+function onAgeInput(){
+  const v=parseInt(document.getElementById('age-input').value);
+  const err=document.getElementById('age-err');
+  if(v>=18&&v<=99){bgSel.age=v;err.style.display='none';document.getElementById('age-input').classList.remove('field-error');}
+  else{bgSel.age=null;if(document.getElementById('age-input').value)err.style.display='block';else err.style.display='none';}
+}
+function checkBg(){
+  // 不再禁用按鈕，改成按下後提示
+}
+function goToBgPage2(){
+  // Validate page 1 fields before advancing
+  var errors=[];
+  document.querySelectorAll('.field-error').forEach(function(e){e.classList.remove('field-error');});
+  if(!bgSel.gender){
+    document.getElementById('gender-grid').classList.add('field-error');
+    errors.push('性別');
+  }
+  var ageVal=parseInt(document.getElementById('age-input').value,10);
+  if(!ageVal||ageVal<16||ageVal>99){
+    document.getElementById('age-input').classList.add('field-error');
+    errors.push('年齡（16–99）');
+  } else { bgSel.age=ageVal; }
+  if(bgSel.arch===null){
+    document.querySelector('.yesno-row') && document.querySelector('.yesno-row').classList.add('field-error');
+    errors.push('建築背景');
+  }
+  if(errors.length>0){
+    showToast('請填寫：'+errors.join('、'),'error');
+    var first=document.querySelector('.field-error');
+    if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  document.getElementById('bg-page-1').style.display='none';
+  document.getElementById('bg-page-2').style.display='';
+  window.scrollTo(0,0);
+  // update step visual
+  document.querySelectorAll('#screen-background .step-dot').forEach(function(d,i){
+    if(i===1){d.classList.remove('current');d.classList.add('done');d.textContent='✓';}
+  });
+}
+function goToBgPage1(){
+  document.getElementById('bg-page-2').style.display='none';
+  document.getElementById('bg-page-1').style.display='';
+  window.scrollTo(0,0);
+}
+function confirmBackground(){
+  // 紅框驗證
+  var missing=[];
+  document.querySelectorAll('.field-error').forEach(function(e){e.classList.remove('field-error');});
+  if(!bgSel.gender){document.getElementById('gender-grid').classList.add('field-error');missing.push('性別');}
+  if(!bgSel.age){document.getElementById('age-input').classList.add('field-error');missing.push('年齡（18–99）');}
+  if(bgSel.arch===null){document.querySelector('.yesno-row').classList.add('field-error');missing.push('建築背景');}
+  if(!bgSel.currentZip){document.getElementById('zip-current').classList.add('field-error');missing.push('現居地');}
+  if(!bgSel.birthZip){document.getElementById('zip-birth').classList.add('field-error');missing.push('出生地');}
+  if(!bgSel.livedNordic){document.getElementById('nordic-grid').classList.add('field-error');missing.push('居住經歷');}
+  if(!bgSel.housingType){document.getElementById('housing-grid').classList.add('field-error');missing.push('目前格局');}
+  if(!bgSel.growupType){document.getElementById('growup-grid').classList.add('field-error');missing.push('成長格局');}
+  if(!bgSel.housingSize){document.getElementById('size-grid').classList.add('field-error');missing.push('坪數');}
+  if(!bgSel.attnCheck){document.getElementById('attn-grid').classList.add('field-error');missing.push('環境評估');}
+  if(!bgSel.livingWith){document.getElementById('living-grid').classList.add('field-error');missing.push('居住狀況');}
+  if(!bgSel.renovation){document.getElementById('renov-grid').classList.add('field-error');missing.push('裝潢參與');}
+  if(missing.length>0){
+    showToast('請完成所有題目','error');
+    var first=document.querySelector('#screen-background .field-error');
+    if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  P.gender=bgSel.gender;P.age=bgSel.age;P.archBg=bgSel.arch;
+  P.currentZip=bgSel.currentZip;P.currentDistrict=bgSel.currentDistrict;
+  P.birthZip=bgSel.birthZip;P.birthDistrict=bgSel.birthDistrict;
+  P.livedNordic=bgSel.livedNordic;
+  P.housingType=bgSel.housingType;P.growupType=bgSel.growupType;
+  P.housingSize=bgSel.housingSize;
+  P.attentionCheckPass=(bgSel.attnCheck==='採光良好、空間寬敞');
+  P.livingWith=bgSel.livingWith;P.renovation=bgSel.renovation;
+  P.pid=P.participantCode||generatePID();
+  document.getElementById('pid-display').textContent=P.pid;
+  goTo('tutorial');
+}
 let sessionData={meta:{},videos:[]};
-const state={loaded:false,duration:80,minWatchSec:52,playing:false,watchedRanges:[],currentWatchStart:null,annotations:[],selectedEmo:null,drawAnnotations:[]};
-const postState={style:null,conf:null,descText:'',audioBlob:null};
+const state={loaded:false,duration:80,minWatchSec:52,playing:false,watchedRanges:[],currentWatchStart:null,annotations:[],selectedEmo:null,drawAnnotations:[],videoEnded:false,focusLostCount:0,questStartTime:null};
+const postState={style:null,conf:null,lightingAnswer:null,descText:'',audioBlob:null};
 const pracState={loaded:false,duration:80,minWatchSec:52,playing:false,watchedRanges:[],currentWatchStart:null,annotations:[],selectedEmo:null,pracStyle:null,pracConf:null,pracDescOk:false,scalesSaved:false};
 
 /* ════ SESSION PERSISTENCE ════ */
@@ -1121,23 +1630,53 @@ document.getElementById('consent-btn').onclick=()=>{
 };
 
 /* ════ BACKGROUND ════ */
-function selRadio(grp,val,el){const g=document.getElementById(grp+'-grid');if(g)g.querySelectorAll('.radio-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');bgSel[grp]=val;checkBg();}
-function selYN(val){bgSel.arch=val;document.getElementById('arch-yes').classList.toggle('sel',val===true);document.getElementById('arch-no').classList.toggle('sel',val===false);checkBg();}
-function onAgeInput(){
-  const v=parseInt(document.getElementById('age-input').value);
-  const err=document.getElementById('age-err');
-  if(v>=16&&v<=99){bgSel.age=v;err.style.display='none';}
-  else{bgSel.age=null;if(document.getElementById('age-input').value)err.style.display='block';else err.style.display='none';}
-  checkBg();
-}
-function checkBg(){document.getElementById('bg-btn').disabled=!(bgSel.gender&&bgSel.age&&bgSel.arch!==null);}
-function confirmBackground(){P.gender=bgSel.gender;P.age=bgSel.age;P.archBg=bgSel.arch;P.pid=generatePID();document.getElementById('pid-display').textContent=P.pid;goTo('tutorial');}
-function generatePID(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let r='P-';for(let i=0;i<4;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
+// selRadio, selYN, onAgeInput, onZipInput, checkBg, confirmBackground 定義在上方 ZIP_DB 區塊
 
 /* ════ PRACTICE ════ */
 const pracTasks={playVideo:{label:'播放影片',done:false},selectEmo:{label:'選擇情緒',done:false},markOnce:{label:'標記一次',done:false},fillQuest:{label:'完成問卷',done:false}};
 function markPracTask(key){if(pracTasks[key].done)return;pracTasks[key].done=true;renderTaskPills();checkPracDone();}
-function checkPracDone(){const allDone=Object.values(pracTasks).every(t=>t.done);document.getElementById('practice-next-btn').disabled=!allDone;if(allDone)showToast('✓ 所有練習任務完成！','success');}
+function validateAndFinishPractice(){
+  var errors=[];
+  document.querySelectorAll('#screen-practice .field-error').forEach(function(e){e.classList.remove('field-error');});
+  // style
+  if(!pracState.pracStyle){
+    var sg=document.querySelector('#screen-practice .section-block');
+    if(sg)sg.classList.add('field-error');
+    errors.push('風格判斷');
+  }
+  // confidence
+  if(!pracState.pracConf){
+    var cr=document.querySelector('#screen-practice #prac-conf-row');
+    if(cr)cr.classList.add('field-error');
+    errors.push('信心程度');
+  }
+  // description
+  var ta=document.getElementById('prac-desc-ta');
+  if(!ta||ta.value.trim().length<20){
+    if(ta)ta.classList.add('field-error');
+    errors.push('空間描述（至少20字）');
+  }
+  // scales
+  var missingScales=0;
+  SCALES.forEach(function(g){g.items.forEach(function(item){
+    var row=document.querySelector('.likert-row[data-key="prac_'+item.key+'"]');
+    if(row&&!document.querySelector('.likert-btn.sel[data-key="prac_'+item.key+'"]')){
+      row.classList.add('field-error');missingScales++;
+    }
+  });});
+  if(missingScales>0)errors.push('量表評分（還差 '+missingScales+' 題）');
+  if(errors.length>0){
+    var hint=document.getElementById('prac-validation-hint');
+    hint.textContent='⚠ 請完成：'+errors.join('、');
+    hint.style.display='block';
+    showToast('請完成所有必填項目','error');
+    var first=document.querySelector('#screen-practice .field-error');
+    if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  document.getElementById('prac-validation-hint').style.display='none';
+  finishPractice();
+}
 function renderTaskPills(){const wrap=document.getElementById('task-pills-wrap');wrap.innerHTML='';Object.values(pracTasks).forEach(t=>{const el=document.createElement('div');el.className='task-pill'+(t.done?' done':'');el.innerHTML='<div class="task-pill-dot"></div>'+t.label;wrap.appendChild(el);});}
 
 const pracVideo=document.getElementById('prac-video');
@@ -1192,14 +1731,24 @@ function updatePracWatchWidget(){
   if(w>=mws){
     document.getElementById('prac-unlock-hint').classList.add('hidden');
     document.getElementById('prac-quest-section').classList.add('visible');
+    // 第一次解鎖時隨機排列練習風格選項
+    if(!window._pracStyleShuffled){
+      window._pracStyleShuffled=true;
+      (function(){
+        var grid=document.getElementById('prac-style-grid');
+        if(!grid)return;
+        var cards=Array.from(grid.children);
+        for(var i=cards.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));grid.appendChild(cards[j]);cards.splice(j,1);}
+      })();
+    }
   }
 }
-const PRAC_TAG_BTN_IDS={like_design:'prac-btn-like',dislike_design:'prac-btn-dislike',design_good:'prac-btn-good',design_bad:'prac-btn-bad'};
+const PRAC_TAG_BTN_IDS={like_scene:'prac-btn-like',dislike_scene:'prac-btn-dislike'};
 function pracMarkTag(tag){
   if(!pracState.loaded){showToast('請先播放影片','error');return;}
   var t=pracVideo.currentTime;
   var label=TAG_LABELS[tag]||tag;
-  pracState.annotations.push({id:Date.now(),time:t,emotion:tag,label:label});
+  pracState.annotations.push({id:Date.now(),tagIndex:++_annCounter,time:Math.round(t*1000)/1000,wallClock:new Date().toISOString(),emotion:tag,label:label});
   renderPracAnnotations();
   markPracTask('selectEmo');markPracTask('markOnce');
   var btn=document.getElementById(PRAC_TAG_BTN_IDS[tag]);
@@ -1209,22 +1758,38 @@ function pracMarkTag(tag){
 function selPracEmo(el){}  // legacy stub
 function pracMark(){}  // legacy stub
 function pracMarkValence(){}  // legacy stub
-function pracMarkCustom(){}  // legacy stub
-function renderPracAnnotations(){const track=document.getElementById('prac-ann-track'),list=document.getElementById('prac-ann-list'),d=pracState.duration||80;track.querySelectorAll('.ann-pip').forEach(p=>p.remove());pracState.annotations.forEach(ann=>{const pip=document.createElement('div');pip.className='ann-pip';var col=TAG_COLORS[ann.emotion]||getEmoColor(ann.emotion);pip.style.cssText='left:'+(ann.time/d)*100+'%;background:'+col;track.appendChild(pip);});list.innerHTML=pracState.annotations.map(ann=>{var col=TAG_COLORS[ann.emotion]||getEmoColor(ann.emotion);return'<div class="ann-item"><div class="ann-dot" style="background:'+col+'"></div><span class="ann-t">'+fmtTime(ann.time)+'</span><span class="ann-lbl">'+ann.label+'</span></div>';}).join('');}
+function pracMarkCustom(){}  // removed  // legacy stub
+function renderPracAnnotations(){const track=document.getElementById('prac-ann-track'),list=document.getElementById('prac-ann-list'),d=pracState.duration||80;track.querySelectorAll('.ann-pip').forEach(p=>p.remove());pracState.annotations.forEach(ann=>{const pip=document.createElement('div');pip.className='ann-pip';var col=TAG_COLORS[ann.emotion]||getEmoColor(ann.emotion);pip.style.cssText='left:'+(ann.time/d)*100+'%;background:'+col;track.appendChild(pip);});const sorted=[...pracState.annotations].sort(function(a,b){return a.tagIndex-b.tagIndex;});list.innerHTML=sorted.map(ann=>{var col=TAG_COLORS[ann.emotion]||getEmoColor(ann.emotion);return'<div class="ann-item"><div class="ann-dot" style="background:'+col+'"></div><span class="ann-t">'+fmtTime(ann.time)+'</span><span class="ann-lbl">'+(ann.label||ann.emotion)+'</span><button class="ann-del" onclick="event.stopPropagation();deletePracAnn('+ann.id+')">×</button></div>';}).join('');}
 function selPracStyle(code,el){document.querySelectorAll('#prac-quest-section .style-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');pracState.pracStyle=code;checkPracQuest();}
 function selPracConf(val,el){document.querySelectorAll('#prac-conf-row .conf-chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');pracState.pracConf=val;checkPracQuest();}
 function onPracDescInput(){const v=document.getElementById('prac-desc-ta').value;pracState.pracDescOk=v.length>=20;document.getElementById('prac-desc-count').textContent=v.length+' 字';checkPracQuest();}
-function checkPracQuest(){if(pracState.pracStyle&&pracState.pracConf&&pracState.pracDescOk&&pracState.scalesSaved){markPracTask('fillQuest');}}
+function checkPracQuest(){
+  // check all scales filled
+  var allScalesFilled=true;
+  SCALES.forEach(function(g){g.items.forEach(function(item){
+    if(!document.querySelector('.likert-btn.sel[data-key="prac_'+item.key+'"]'))allScalesFilled=false;
+  });});
+  pracState.scalesSaved=allScalesFilled;
+  if(pracState.pracStyle&&pracState.pracConf&&pracState.pracDescOk&&allScalesFilled){markPracTask('fillQuest');}
+}
 (function buildPracScales(){
   var c=document.getElementById('prac-scale-items');c.innerHTML='';
-  SCALES.forEach(function(group){
-    var gTitle=document.createElement('div');
-    gTitle.style.cssText='font-size:10px;font-family:"IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin:10px 0 6px;';
-    gTitle.textContent=group.group;
-    c.appendChild(gTitle);
+  SCALES.forEach(function(group,gi){
+    var wrap=document.createElement('div');
+    wrap.className='scale-group-wrap';
+    var promptBox=document.createElement('div');
+    promptBox.style.cssText='margin-bottom:12px;padding:10px 14px;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 var(--r2) var(--r2) 0';
+    var promptText=document.createElement('div');
+    promptText.style.cssText='font-size:14px;font-weight:500;color:var(--ink)';
+    promptText.textContent=group.prompt;
+    promptBox.appendChild(promptText);
+    wrap.appendChild(promptBox);
     group.items.forEach(function(item){
-      var row=document.createElement('div');row.className='likert-row';row.dataset.max=item.max;row.dataset.key=item.key;
-      var la=document.createElement('div');la.className='likert-anchor';la.textContent=item.lo;
+      var row=document.createElement('div');row.className='likert-row';row.dataset.max=item.max;row.dataset.key='prac_'+item.key;
+      var anchors=document.createElement('div');anchors.className='likert-anchors';
+      var lo=document.createElement('span');lo.textContent=item.lo;
+      var hi=document.createElement('span');hi.textContent=item.hi;
+      anchors.appendChild(lo);anchors.appendChild(hi);
       var btns=document.createElement('div');btns.className='likert-btns';
       for(var i=1;i<=item.max;i++){
         var b=document.createElement('button');b.className='likert-btn';b.textContent=i;
@@ -1233,21 +1798,49 @@ function checkPracQuest(){if(pracState.pracStyle&&pracState.pracConf&&pracState.
           var k=this.dataset.key;
           document.querySelectorAll('.likert-btn[data-key="'+k+'"]').forEach(function(x){x.classList.remove('sel');});
           this.classList.add('sel');
+          var r=this.closest('.likert-row');if(r)r.classList.remove('field-error');
+          checkPracQuest();
         });
         btns.appendChild(b);
       }
-      var ra=document.createElement('div');ra.className='likert-anchor right';ra.textContent=item.hi;
-      row.appendChild(la);row.appendChild(btns);row.appendChild(ra);
-      c.appendChild(row);
+      row.appendChild(anchors);row.appendChild(btns);
+      wrap.appendChild(row);
     });
+    c.appendChild(wrap);
   });
 })();
 function pracSaveScale(){pracState.scalesSaved=true;checkPracQuest();showToast('量表已儲存','success');}
 
 function finishPractice(){
+  // record practice data into session meta
+  const pracScalesDone=SCALES.every(g=>g.items.every(item=>
+    document.querySelector('.likert-btn.sel[data-key="prac_'+item.key+'"]')));
+  sessionData.practiceData={
+    annotationCount:pracState.annotations.length,
+    annotations:pracState.annotations.map(({time,wallClock,emotion})=>({time,wallClock,emotion})),
+    watchedSeconds:Math.round(pracState.watchedRanges.reduce((s,[a,b])=>s+b-a,0)),
+    watchedRanges:pracState.watchedRanges.map(([a,b])=>[Math.round(a*100)/100,Math.round(b*100)/100]),
+    videoEnded:pracState.videoEnded||false,
+    styleGuess:pracState.pracStyle,
+    styleGuessCorrect:pracState.pracStyle==='MODN', // practice video is SPACE_05_MODN
+    styleConfidence:pracState.pracConf,
+    scaleCompleted:pracScalesDone,
+    descriptionLength:(document.getElementById('prac-desc-ta')||{}).value?.length||0,
+  };
   const seed=P.pid.split('').reduce((s,c)=>s+c.charCodeAt(0),0);
   assignedVideos=assignVideos(seed);
-  sessionData.meta={participantId:P.pid,gender:P.gender,age:P.age,architectureBackground:P.archBg,consentTime:P.consentTime,sessionStart:new Date().toISOString()};
+  sessionData.meta={
+    participantId:P.pid,participantCode:P.participantCode,
+    gender:P.gender,age:P.age,architectureBackground:P.archBg,
+    currentZip:P.currentZip,currentDistrict:P.currentDistrict,
+    birthZip:P.birthZip,birthDistrict:P.birthDistrict,
+    livedNordic:P.livedNordic,
+    housingType:P.housingType,growupType:P.growupType,
+    housingSize:P.housingSize,livingWith:P.livingWith,
+    renovation:P.renovation,attentionCheckPass:P.attentionCheckPass,
+    consentTime:P.consentTime,sessionStart:new Date().toISOString(),
+    layoutVariant:LAYOUT_VARIANT
+  };
   sessionData.videos=[];
   currentVideoIdx=0;
   goTo('experiment');
@@ -1264,8 +1857,10 @@ function loadExperimentVideo(){
   const vinfo=assignedVideos[currentVideoIdx];
   // reset state
   state.loaded=false;state.playing=false;state.watchedRanges=[];state.currentWatchStart=null;
-  state.annotations=[];state.selectedEmo=null;state.drawAnnotations=[];
-  postState.style=null;postState.conf=null;postState.descText='';postState.audioBlob=null;
+  state.annotations=[];state.selectedEmo=null;state.drawAnnotations=[];state.questStartTime=null;
+  state.videoEnded=false;state.focusLostCount=0;scaleStartTime=null;
+  _annCounter=0;
+  postState.style=null;postState.conf=null;postState.lightingAnswer=null;postState.descText='';postState.audioBlob=null;
   // detach old listeners
   video.onplay=null;video.onpause=null;video.onended=null;video.ontimeupdate=null;video.onseeking=null;video.onseeked=null;
   // reset UI
@@ -1273,7 +1868,7 @@ function loadExperimentVideo(){
   document.getElementById('watch-label').textContent='0s / —';
   document.getElementById('watch-bar').style.width='0%';
   document.getElementById('next-video-btn').disabled=true;
-  document.getElementById('next-video-btn2').disabled=true;
+  document.getElementById('next-video-btn2').disabled=false;
   document.getElementById('scrubber-fill').style.width='0%';
   document.getElementById('scrubber-thumb').style.left='0%';
   document.getElementById('dur-label').textContent='—';
@@ -1284,6 +1879,13 @@ function loadExperimentVideo(){
   document.getElementById('topbar-video-info').textContent='影片 '+(currentVideoIdx+1)+' / '+VIDEOS_PER_SESS;
   // reset questionnaire
   document.querySelectorAll('#quest-section .style-card').forEach(c=>c.classList.remove('sel'));
+  // 每次載入新影片時隨機排列風格選項，避免 response bias
+  (function shuffleStyleGrid(){
+    var grid=document.getElementById('main-style-grid');
+    if(!grid)return;
+    var cards=Array.from(grid.children);
+    for(var i=cards.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));grid.appendChild(cards[j]);cards.splice(j,1);}
+  })();
   document.querySelectorAll('.conf-chip').forEach(c=>c.classList.remove('sel'));
   document.getElementById('desc-ta').value='';
   document.getElementById('desc-count').textContent='0 字';
@@ -1342,11 +1944,15 @@ function loadExperimentVideo(){
 function setupVideoListeners(){
   video.onplay=()=>{state.playing=true;state.currentWatchStart=video.currentTime;document.getElementById('watch-dot').classList.add('live');updatePlayBtn();};
   video.onpause=()=>{state.playing=false;recordWatched();document.getElementById('watch-dot').classList.remove('live');updatePlayBtn();};
-  video.onended=()=>{state.playing=false;recordWatched();updatePlayBtn();};
+  video.onended=()=>{state.playing=false;state.videoEnded=true;recordWatched();updatePlayBtn();};
   video.ontimeupdate=onTimeUpdate;
   video.onseeking=()=>{if(state.currentWatchStart!==null)recordWatched();};
   video.onseeked=()=>{state.currentWatchStart=video.currentTime;};
 }
+// focus lost counter — tracks if participant switches tabs during experiment
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden&&state.loaded)state.focusLostCount++;
+});
 function recordWatched(){if(state.currentWatchStart===null)return;const e=video.currentTime;if(e>state.currentWatchStart){state.watchedRanges.push([state.currentWatchStart,e]);state.watchedRanges=mergeRanges(state.watchedRanges);}state.currentWatchStart=null;renderWatchedSegs();updateWatchWidget();}
 function mergeRanges(r){if(!r.length)return[];r.sort((a,b)=>a[0]-b[0]);const m=[r[0]];for(let i=1;i<r.length;i++){const l=m[m.length-1];if(r[i][0]<=l[1])l[1]=Math.max(l[1],r[i][1]);else m.push(r[i]);}return m;}
 function totalWatched(){return state.watchedRanges.reduce((s,[a,b])=>s+b-a,0)+(state.playing&&state.currentWatchStart!==null?video.currentTime-state.currentWatchStart:0);}
@@ -1354,12 +1960,18 @@ function onTimeUpdate(){const t=video.currentTime,d=state.duration||80,p=d?(t/d)
 function updateWatchWidget(){
   const mws=state.minWatchSec||52;
   const w=Math.min(totalWatched(),mws);
-  document.getElementById('watch-label').textContent=Math.floor(w)+'s / '+mws+'s';
-  document.getElementById('watch-bar').style.width=(w/mws*100)+'%';
+  const remaining=Math.max(0,Math.ceil(mws-totalWatched()));
   if(w>=mws){
+    document.getElementById('watch-label').textContent='✓ 觀看達標';
+    document.getElementById('watch-bar').style.width='100%';
     document.getElementById('next-video-btn').disabled=false;
     document.getElementById('quest-unlock-hint').classList.add('hidden');
+    if(!scaleStartTime)scaleStartTime=Date.now();
+    if(!state.questStartTime)state.questStartTime=Date.now();
     document.getElementById('quest-section').classList.add('visible');
+  } else {
+    document.getElementById('watch-label').textContent='還需觀看 '+remaining+'s';
+    document.getElementById('watch-bar').style.width=(w/mws*100)+'%';
   }
 }
 function renderWatchedSegs(){const d=state.duration||80;document.getElementById('watched-segs').innerHTML=state.watchedRanges.map(([a,b])=>'<div class="watched-seg" style="left:'+(a/d)*100+'%;width:'+((b-a)/d)*100+'%"></div>').join('');}
@@ -1369,15 +1981,16 @@ function skipTime(dt){if(state.loaded){recordWatched();video.currentTime=Math.ma
 function scrubberClick(e){if(!state.loaded)return;recordWatched();const r=e.currentTarget.getBoundingClientRect();video.currentTime=((e.clientX-r.left)/r.width)*state.duration;state.currentWatchStart=video.currentTime;}
 function initCanvas(){canvas.width=document.getElementById('video-stage').clientWidth;canvas.height=document.getElementById('video-stage').clientHeight;}
 window.addEventListener('resize',()=>{if(state.loaded)initCanvas();});
-const TAG_LABELS={like_design:'👍 喜歡這邊的設計',dislike_design:'👎 不喜歡這邊的設計',design_good:'✅ 這邊設計的好',design_bad:'❌ 這邊設計的不好'};
-const TAG_BTN_IDS={like_design:'main-btn-like',dislike_design:'main-btn-dislike',design_good:'main-btn-good',design_bad:'main-btn-bad'};
-const TAG_COLORS={like_design:'#2d7a4e',dislike_design:'#9b3535',design_good:'#1d6a9f',design_bad:'#7a5c1e'};
+// 跨影片全局標注計數器，每次 loadExperimentVideo 重置
+var _annCounter=0;
+const TAG_LABELS={like_scene:'👍 喜歡這個場景的設計',dislike_scene:'👎 不喜歡這個場景的設計'};
+const TAG_BTN_IDS={like_scene:'main-btn-like',dislike_scene:'main-btn-dislike'};
+const TAG_COLORS={like_scene:'#2d7a4e',dislike_scene:'#9b3535'};
 function markTag(tag){
   if(!state.loaded){showToast('請先播放影片','error');return;}
   var t=video.currentTime;
   var label=TAG_LABELS[tag]||tag;
-  state.annotations.push({id:Date.now(),time:t,emotion:tag,label:label,timestamp:new Date().toISOString()});
-  state.annotations.sort(function(a,b){return a.time-b.time;});
+  state.annotations.push({id:Date.now(),tagIndex:++_annCounter,time:Math.round(t*1000)/1000,wallClock:new Date().toISOString(),emotion:tag,label:label});
   renderAnnotations();
   var btn=document.getElementById(TAG_BTN_IDS[tag]);
   if(btn){btn.classList.add('flash');setTimeout(function(){btn.classList.remove('flash');},300);}
@@ -1386,7 +1999,7 @@ function markTag(tag){
 function selectEmo(el){}  // legacy stub
 function markAnnotation(){}  // legacy stub
 function markValence(){}  // legacy stub
-function markCustom(){}  // legacy stub
+function markCustom(){}  // removed  // legacy stub
 function renderAnnotations(){
   var track=document.getElementById('ann-track'),list=document.getElementById('ann-list'),d=state.duration||80;
   track.querySelectorAll('.ann-pip').forEach(function(p){p.remove();});
@@ -1398,12 +2011,14 @@ function renderAnnotations(){
     pip.onclick=function(){video.currentTime=ann.time;};
     track.appendChild(pip);
   });
-  list.innerHTML=state.annotations.map(function(ann){
+  var sortedAnns=[...state.annotations].sort(function(a,b){return a.tagIndex-b.tagIndex;});
+  list.innerHTML=sortedAnns.map(function(ann){
     var col=TAG_COLORS[ann.emotion]||getEmoColor(ann.emotion);
     return '<div class="ann-item"><div class="ann-dot" style="background:'+col+'"></div><span class="ann-t">'+fmtTime(ann.time)+'</span><span class="ann-lbl">'+(ann.label||ann.emotion)+'</span><button class="ann-del" onclick="event.stopPropagation();deleteAnn('+ann.id+')">×</button></div>';
   }).join('');
 }
 function deleteAnn(id){state.annotations=state.annotations.filter(a=>a.id!==id);renderAnnotations();}
+function deletePracAnn(id){pracState.annotations=pracState.annotations.filter(a=>a.id!==id);renderPracAnnotations();}
 
 /* ════ QUESTIONNAIRE ════ */
 function buildPostScales(){
@@ -1411,16 +2026,23 @@ function buildPostScales(){
   SCALES.forEach(function(group,gi){
     var wrap=document.createElement('div');
     wrap.className='scale-group-wrap';
-    var gTitle=document.createElement('div');
-    gTitle.className='scale-group-label';
-    gTitle.textContent=group.group;
-    wrap.appendChild(gTitle);
+    // 引導語標題（Coburn 三段式格式）
+    var promptBox=document.createElement('div');
+    promptBox.style.cssText='margin-bottom:12px;padding:10px 14px;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 var(--r2) var(--r2) 0';
+    var promptText=document.createElement('div');
+    promptText.style.cssText='font-size:14px;font-weight:500;color:var(--ink)';
+    promptText.textContent=group.prompt;
+    promptBox.appendChild(promptText);
+    wrap.appendChild(promptBox);
     group.items.forEach(function(item){
       var row=document.createElement('div');
       row.className='likert-row';
       row.dataset.max=item.max;
       row.dataset.key=item.key;
-      var la=document.createElement('div');la.className='likert-anchor';la.textContent=item.lo;
+      var anchors=document.createElement('div');anchors.className='likert-anchors';
+      var lo=document.createElement('span');lo.textContent=item.lo;
+      var hi=document.createElement('span');hi.textContent=item.hi;
+      anchors.appendChild(lo);anchors.appendChild(hi);
       var btns=document.createElement('div');btns.className='likert-btns';
       for(var i=1;i<=item.max;i++){
         var b=document.createElement('button');b.className='likert-btn';b.textContent=i;
@@ -1429,14 +2051,12 @@ function buildPostScales(){
           var k=this.dataset.key;
           document.querySelectorAll('.likert-btn[data-key="'+k+'"]').forEach(function(x){x.classList.remove('sel');});
           this.classList.add('sel');
-          // clear field-error on this row
           var r=this.closest('.likert-row');if(r)r.classList.remove('field-error');
           checkPostForm();
         });
         btns.appendChild(b);
       }
-      var ra=document.createElement('div');ra.className='likert-anchor right';ra.textContent=item.hi;
-      row.appendChild(la);row.appendChild(btns);row.appendChild(ra);
+      row.appendChild(anchors);row.appendChild(btns);
       wrap.appendChild(row);
     });
     c.appendChild(wrap);
@@ -1444,62 +2064,205 @@ function buildPostScales(){
 }
 function selStyle(code,el){document.querySelectorAll('#quest-section .style-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');postState.style=code;checkPostForm();}
 function selConf(val,el){document.querySelectorAll('.conf-chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');postState.conf=val;checkPostForm();}
+function selLighting(val,el){
+  document.querySelectorAll('#lighting-opts .style-card').forEach(function(c){c.classList.remove('sel');});
+  el.classList.add('sel');
+  postState.lightingAnswer=val;
+  checkPostReady();
+}
 function onDescInput(){const v=document.getElementById('desc-ta').value;postState.descText=v;const cnt=v.length;document.getElementById('desc-count').textContent=cnt+' 字';document.getElementById('desc-count').style.color=cnt>=20?'var(--accent)':'var(--ink4)';checkPostForm();}
 function checkPostForm(){
-  var scalesDone=true;
-  SCALES.forEach(function(g){g.items.forEach(function(item){
-    if(!document.querySelector('.likert-btn.sel[data-key="'+item.key+'"]'))scalesDone=false;
-  });});
-  document.getElementById('next-video-btn2').disabled=!(postState.style!==null&&postState.conf!==null&&postState.descText.length>=20&&scalesDone);
+  // 不再禁用按鈕，按下去才驗證
 }
 function validateAndSubmit(){
   var errors=[];
-  // clear previous errors
   document.querySelectorAll('.field-error').forEach(function(e){e.classList.remove('field-error');});
+  // lighting
+  if(!postState.lightingAnswer){
+    document.getElementById('lighting-section').classList.add('field-error');
+    errors.push('空間照明');
+  }
   // style
   if(postState.style===null){
-    document.querySelector('#quest-section .section-block').classList.add('field-error');
-    errors.push('請選擇風格判斷');
+    var styleBlock=document.querySelector('#quest-section .section-block');
+    if(styleBlock)styleBlock.classList.add('field-error');
+    errors.push('風格判斷');
   }
   // confidence
   if(postState.conf===null){
     document.getElementById('conf-row').classList.add('field-error');
-    errors.push('請選擇信心程度');
+    errors.push('信心程度');
   }
   // description
   if(postState.descText.length<20){
     document.getElementById('desc-ta').classList.add('field-error');
-    errors.push('空間描述至少需要 20 字');
+    errors.push('空間描述（至少20字）');
   }
   // scales
-  var firstMissing=null;
+  var missingScales=0;
   SCALES.forEach(function(g){g.items.forEach(function(item){
     var row=document.querySelector('.likert-row[data-key="'+item.key+'"]');
     if(row&&!document.querySelector('.likert-btn.sel[data-key="'+item.key+'"]')){
       row.classList.add('field-error');
-      if(!firstMissing)firstMissing=row;
-      errors.push('量表「'+item.label+'」尚未評分');
+      missingScales++;
     }
   });});
+  if(missingScales>0)errors.push('量表評分（還差 '+missingScales+' 題）');
   if(errors.length>0){
+    var hint=document.getElementById('validation-hint');
+    hint.textContent='⚠ 請完成：'+errors.join('、');
+    hint.style.display='block';
     showToast('請完成所有必填項目','error');
-    var first=document.querySelector('.field-error');
+    var first=document.querySelector('#quest-section .field-error');
     if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
+  document.getElementById('validation-hint').style.display='none';
   submitPostVideo();
 }
-let mediaRecorder=null,audioChunks=[];
-async function toggleVoice(){
-  const btn=document.getElementById('voice-btn'),status=document.getElementById('voice-status');
-  if(mediaRecorder&&mediaRecorder.state==='recording'){mediaRecorder.stop();return;}
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    audioChunks=[];mediaRecorder=new MediaRecorder(stream);
-    mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
-    mediaRecorder.onstop=()=>{postState.audioBlob=new Blob(audioChunks,{type:'audio/webm'});stream.getTracks().forEach(t=>t.stop());btn.textContent='🎙 重新錄音';status.textContent='✓ 錄音完成（'+Math.round(postState.audioBlob.size/1024)+'KB）';};
-    mediaRecorder.start();btn.textContent='⏹ 停止錄音';btn.style.borderColor='var(--danger)';btn.style.color='var(--danger)';status.textContent='● 錄音中...';
-  }catch(e){status.textContent='⚠ 無法存取麥克風，請使用文字輸入';}
+/* ── SPEECH TO TEXT ── */
+let _recognition = null;
+let _speechSupported = false;
+
+(function detectSpeech(){
+  try {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(SR){
+      _speechSupported = true;
+    } else {
+      document.getElementById('speech-support-hint') && 
+        (document.getElementById('speech-support-hint').style.display='block');
+    }
+  } catch(e){ /* not supported */ }
+})();
+
+function startSpeech(e){
+  if(e) e.preventDefault();
+  if(!_speechSupported){
+    document.getElementById('voice-status').textContent='此瀏覽器不支援語音輸入';
+    return;
+  }
+  try {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    _recognition = new SR();
+    _recognition.lang = 'zh-TW';
+    _recognition.interimResults = true;
+    _recognition.continuous = true;
+
+    const ta = document.getElementById('desc-ta');
+    const existingText = ta.value;
+    const prefix = existingText && !existingText.endsWith(' ') && existingText.length > 0
+      ? existingText + ' ' : existingText;
+
+    _recognition.onstart = function(){
+      const btn = document.getElementById('voice-btn');
+      btn.classList.add('listening');
+      document.getElementById('voice-icon').textContent = '🔴';
+      document.getElementById('voice-btn-label').textContent = '正在聆聽...';
+      document.getElementById('voice-status').textContent = '說話中，放開停止';
+    };
+
+    _recognition.onresult = function(e){
+      let interim = '', final = '';
+      for(let i = e.resultIndex; i < e.results.length; i++){
+        if(e.results[i].isFinal) final += e.results[i][0].transcript;
+        else interim += e.results[i][0].transcript;
+      }
+      ta.value = prefix + final + interim;
+      onDescInput();
+    };
+
+    _recognition.onerror = function(e){
+      stopSpeech();
+      if(e.error === 'not-allowed'){
+        document.getElementById('voice-status').textContent = '⚠ 請允許麥克風權限';
+      } else if(e.error === 'no-speech'){
+        document.getElementById('voice-status').textContent = '沒有偵測到語音';
+      } else {
+        document.getElementById('voice-status').textContent = '語音輸入錯誤：' + e.error;
+      }
+    };
+
+    _recognition.onend = function(){
+      stopSpeech();
+    };
+
+    _recognition.start();
+  } catch(err){
+    document.getElementById('voice-status').textContent = '無法啟動語音輸入';
+  }
+}
+
+function stopSpeech(){
+  if(_recognition){
+    try { _recognition.stop(); } catch(e){}
+    _recognition = null;
+  }
+  const btn = document.getElementById('voice-btn');
+  if(btn){
+    btn.classList.remove('listening');
+    document.getElementById('voice-icon').textContent = '🎙';
+    document.getElementById('voice-btn-label').textContent = '按住說話';
+    document.getElementById('voice-status').textContent = '';
+  }
+}
+
+function toggleVoice(){}  // legacy stub
+
+/* ── PRACTICE SPEECH ── */
+let _pracRecognition = null;
+function startPracSpeech(e){
+  if(e) e.preventDefault();
+  if(!_speechSupported){
+    document.getElementById('prac-voice-status').textContent='此瀏覽器不支援語音輸入';
+    return;
+  }
+  try {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    _pracRecognition = new SR();
+    _pracRecognition.lang = 'zh-TW';
+    _pracRecognition.interimResults = true;
+    _pracRecognition.continuous = true;
+    const ta = document.getElementById('prac-desc-ta');
+    const existingText = ta.value;
+    const prefix = existingText && !existingText.endsWith(' ') && existingText.length > 0
+      ? existingText + ' ' : existingText;
+    _pracRecognition.onstart = function(){
+      const btn = document.getElementById('prac-voice-btn');
+      btn.classList.add('listening');
+      document.getElementById('prac-voice-icon').textContent = '🔴';
+      document.getElementById('prac-voice-btn-label').textContent = '正在聆聽...';
+      document.getElementById('prac-voice-status').textContent = '說話中，放開停止';
+    };
+    _pracRecognition.onresult = function(e){
+      let interim='',final='';
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+        else interim+=e.results[i][0].transcript;
+      }
+      ta.value = prefix + final + interim;
+      onPracDescInput();
+    };
+    _pracRecognition.onerror = function(e){
+      stopPracSpeech();
+      if(e.error==='not-allowed') document.getElementById('prac-voice-status').textContent='⚠ 請允許麥克風權限';
+      else document.getElementById('prac-voice-status').textContent='語音輸入錯誤：'+e.error;
+    };
+    _pracRecognition.onend = function(){ stopPracSpeech(); };
+    _pracRecognition.start();
+  } catch(err){
+    document.getElementById('prac-voice-status').textContent='無法啟動語音輸入';
+  }
+}
+function stopPracSpeech(){
+  if(_pracRecognition){ try{_pracRecognition.stop();}catch(e){} _pracRecognition=null; }
+  const btn=document.getElementById('prac-voice-btn');
+  if(btn){
+    btn.classList.remove('listening');
+    document.getElementById('prac-voice-icon').textContent='🎙';
+    document.getElementById('prac-voice-btn-label').textContent='按住說話';
+    document.getElementById('prac-voice-status').textContent='';
+  }
 }
 function getScaleValues(){
   var vals={};
@@ -1508,24 +2271,87 @@ function getScaleValues(){
   });
   return vals;
 }
-function goToPostVideo(){} // legacy stub
+let scaleStartTime=null;
+function goToPostVideoSection(){
+  scaleStartTime=Date.now();
+  document.getElementById('quest-section').classList.add('visible');
+}
 function submitPostVideo(){
+  // 強制 flush 目前正在進行的觀看區間（例如影片自然結束時未 flush）
+  if(state.currentWatchStart!==null&&video&&video.currentTime>state.currentWatchStart){
+    state.watchedRanges.push([state.currentWatchStart,video.currentTime]);
+    state.watchedRanges=mergeRanges(state.watchedRanges);
+    state.currentWatchStart=null;
+  }
   const vinfo=assignedVideos[currentVideoIdx];
   const vidEl=document.getElementById('main-video');
+  const scalesDurationSec=scaleStartTime?Math.round((Date.now()-scaleStartTime)/1000):null;
+  // watchedRanges 格式：{videoId, ranges: [[start,end],...], totalSec}
+  const ranges=state.watchedRanges.map(([a,b])=>[Math.round(a*100)/100,Math.round(b*100)/100]);
   sessionData.videos.push({
     order:currentVideoIdx+1,videoId:vinfo.videoId,style:vinfo.style,spaceNum:vinfo.spaceNum,
     watchedSeconds:Math.round(totalWatched()),
+    watchedRanges:ranges,
+    watchedRangesMeta:{videoId:vinfo.videoId,totalSec:Math.round(totalWatched()),segments:ranges.length},
+    videoEnded:state.videoEnded,
+    focusLostCount:state.focusLostCount,
     styleGuess:postState.style,styleGuessCorrect:postState.style===vinfo.style,styleConfidence:postState.conf,
+    lightingAnswer:postState.lightingAnswer,
+    lightingCorrect:LIGHTING_ANSWERS[vinfo.videoId]!=='PLACEHOLDER'&&postState.lightingAnswer===LIGHTING_ANSWERS[vinfo.videoId],
     description:postState.descText,hasAudio:postState.audioBlob!==null,
-    timestamps:state.annotations.map(({time,emotion})=>({time:Math.round(time*100)/100,emotion})),
+    timestamps:state.annotations.map(({time,wallClock,emotion})=>({time,wallClock,emotion})),
     scales:getScaleValues(),
+    questDurationSec:state.questStartTime ? Math.round((Date.now()-state.questStartTime)/1000) : null,
+    scalesDurationSec:scalesDurationSec,
     videoDisplayW:vidEl?vidEl.clientWidth:null,
     videoDisplayH:vidEl?vidEl.clientHeight:null,
   });
   currentVideoIdx++;
   saveSession();
-  if(currentVideoIdx>=VIDEOS_PER_SESS){finishExperiment();}
-  else{loadExperimentVideo();window.scrollTo(0,0);showToast('✓ 第'+currentVideoIdx+'部完成，載入第'+(currentVideoIdx+1)+'部...','success');}
+  if(currentVideoIdx>=VIDEOS_PER_SESS){
+    finishExperiment();
+  } else if(currentVideoIdx%2===0){
+    // 每 2 部後顯示休息畫面
+    showRestScreen(currentVideoIdx, VIDEOS_PER_SESS);
+  } else {
+    loadExperimentVideo();
+    window.scrollTo(0,0);
+    showToast('✓ 第'+currentVideoIdx+'部完成，載入第'+(currentVideoIdx+1)+'部...','success');
+  }
+}
+
+/* ════ REST SCREEN ════ */
+let _restTimer=null;
+function showRestScreen(done, total){
+  document.getElementById('rest-done').textContent=done;
+  document.getElementById('rest-total').textContent=total;
+  document.getElementById('rest-title').textContent=done+' / '+total+' 部完成，稍作休息';
+  // show screen
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-rest').classList.add('active');
+  window.scrollTo(0,0);
+  // countdown
+  var secs=8;
+  var ring=document.getElementById('rest-ring');
+  var countEl=document.getElementById('rest-count');
+  var circumference=263.9;
+  countEl.textContent=secs;
+  ring.style.strokeDashoffset='0';
+  clearInterval(_restTimer);
+  _restTimer=setInterval(function(){
+    secs--;
+    countEl.textContent=secs;
+    ring.style.strokeDashoffset=circumference*(1-secs/8);
+    if(secs<=0){clearInterval(_restTimer);endRest();}
+  },1000);
+}
+function endRest(){
+  clearInterval(_restTimer);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('app-screen').classList.add('active');
+  loadExperimentVideo();
+  window.scrollTo(0,0);
+  showToast('繼續第'+(currentVideoIdx+1)+'部影片','success');
 }
 
 /* ════ FINISH ════ */
@@ -1564,11 +2390,12 @@ async function submitToSheets(code){
   const scaleKeys=[];SCALES.forEach(g=>g.items.forEach(i=>scaleKeys.push(i.key)));
   const rows=sessionData.videos.map(function(v){
     const flat={};scaleKeys.forEach(k=>{flat['scale_'+k]=v.scales?v.scales[k]??'':''});
-    return Object.assign({},v,flat,{scales:undefined,timestamps:JSON.stringify(v.timestamps||[])});
+    return Object.assign({},v,flat,{scales:undefined,timestamps:JSON.stringify(v.timestamps||[]),watchedRanges:JSON.stringify(v.watchedRanges||[])});
   });
   const payload=JSON.stringify({
     token: GAS_TOKEN,
     meta: sessionData.meta,
+    practiceData: sessionData.practiceData||null,
     participantCode: P.participantCode||'',
     completionCode: code,
     email: P.email,
@@ -1625,7 +2452,7 @@ function advancePracGuide(toStep){
   var prog=document.getElementById('prac-guide-progress');
   if(prog)prog.textContent=Math.min(toStep,pracGuideMax)+' / '+pracGuideMax;
   // animate hint keys for new step
-  if(toStep===1){setTimeout(()=>{animGuideKey('pkd-q');setTimeout(()=>animGuideKey('pkd-e'),200);setTimeout(()=>animGuideKey('pkd-z'),400);setTimeout(()=>animGuideKey('pkd-c'),600);},400);}
+  if(toStep===1){setTimeout(()=>{animGuideKey('pkd-l');setTimeout(()=>animGuideKey('pkd-d'),300);},400);}
 }
 function animGuideKey(id){
   var el=document.getElementById(id);
@@ -1664,22 +2491,19 @@ function fmtTime(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+S
 function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'')+' show';clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);}
 
 /* ════ KEYBOARD ════ */
-// Q=like_design  E=dislike_design  (top row, left/right symmetric)
-// Z=design_good  C=design_bad      (bottom row, left/right symmetric)
+// L=like_scene（喜歡）  D=dislike_scene（不喜歡）  右手食指/中指，自然對稱
 // Space = play/pause
-const TAG_KEYS={KeyQ:'like_design',KeyE:'dislike_design',KeyZ:'design_good',KeyC:'design_bad'};
+const TAG_KEYS={KeyL:'like_scene',KeyD:'dislike_scene'};
 document.addEventListener('keydown',function(e){
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
   var active=document.querySelector('.screen.active');
   if(!active)return;
-  // Space = play / pause
   if(e.code==='Space'){
     e.preventDefault();
     if(active.id==='screen-practice')togglePracPlay();
     else if(active.id==='app-screen')togglePlay();
     return;
   }
-  // Q/E/Z/C = annotation tags
   if(TAG_KEYS[e.code]){
     e.preventDefault();
     var tag=TAG_KEYS[e.code];
