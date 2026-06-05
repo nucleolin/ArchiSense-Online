@@ -1,0 +1,9 @@
+# Data & scripts — do not publish
+*.xlsx
+*.js
+*.docx
+*.pdf
+CLAUDE.md
+old_version/
+.DS_Store
+~$*
