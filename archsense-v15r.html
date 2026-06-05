@@ -1319,7 +1319,7 @@ const RESEARCH_EMAIL_PI = 'kuopc@cs.nthu.edu.tw';
 const RESEARCH_EMAIL2  = 'projectana.nthu.hmilab.tw@gmail.com';
 const SHEETS_URL       = 'https://script.google.com/macros/s/AKfycbxcP_2jAT6nljYuBzBpXvR98x-WBn0WRIt_Mlp_f6pA-d8kkX08LXk3ew4SADjyhrKdag/exec';
 const GAS_TOKEN        = 'as2025nthu';
-const R2_BASE          = 'https://pub-d1170515a6a547b0a0b191a7fe809b1e.r2.dev';
+const R2_BASE          = 'https://archsense-r2.projectana-nthu-hmilab-tw.workers.dev';
 const PRACTICE_VIDEO   = R2_BASE + '/EGVideo_SPACE_05_MODN.mp4';
 const WATCH_THRESHOLD_PCT = 0.65;
 
@@ -1414,7 +1414,7 @@ function assignVideos(seed){
   STYLES.forEach(style=>{
     shuffled.filter(v=>v.endsWith('_'+style)).slice(0,2).forEach(vid=>{
       const sp=vid.match(/SPACE_(\d+)/)[1];
-      picked.push({videoId:vid,style,spaceNum:sp,url:R2_BASE+'/'+vid+'.mp4'});
+      picked.push({videoId:vid,style,spaceNum:sp,url:R2_BASE+'/'+vid+'.mp4?t='+Date.now()});
     });
   });
   return sh(picked,seed+1);
@@ -1681,7 +1681,7 @@ function renderTaskPills(){const wrap=document.getElementById('task-pills-wrap')
 
 const pracVideo=document.getElementById('prac-video');
 function loadPracticeVideo(){
-  pracVideo.src=PRACTICE_VIDEO;
+  pracVideo.src=PRACTICE_VIDEO+'?t='+Date.now();
   const loadEl=document.getElementById('prac-loading');
   loadEl.style.display='flex';
   document.getElementById('prac-play-btn').disabled=true;
