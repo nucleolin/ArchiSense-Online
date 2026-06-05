@@ -941,7 +941,7 @@ body.layout-c .quest-unlock-hint { display: none !important; }
   <div class="exp-content">
     <!-- video -->
     <div class="video-wrap" id="prac-video-wrap">
-      <video id="prac-video" preload="auto"></video>
+      <video id="prac-video" preload="auto" crossorigin="anonymous"></video>
       <div class="vid-wait-overlay" id="prac-loading">
         <div class="vid-spinner"></div>
         <div class="vid-wait-title">載入練習影片中，請稍候…</div>
@@ -1109,7 +1109,7 @@ body.layout-c .quest-unlock-hint { display: none !important; }
     <div class="video-sticky-block">
     <!-- video -->
     <div class="video-wrap" id="video-stage">
-      <video id="main-video"></video>
+      <video id="main-video" crossorigin="anonymous"></video>
       <canvas id="annotation-canvas"></canvas>
       <div class="vid-wait-overlay" id="video-loading">
         <div class="vid-spinner"></div>
@@ -1319,7 +1319,7 @@ const RESEARCH_EMAIL_PI = 'kuopc@cs.nthu.edu.tw';
 const RESEARCH_EMAIL2  = 'projectana.nthu.hmilab.tw@gmail.com';
 const SHEETS_URL       = 'https://script.google.com/macros/s/AKfycbxcP_2jAT6nljYuBzBpXvR98x-WBn0WRIt_Mlp_f6pA-d8kkX08LXk3ew4SADjyhrKdag/exec';
 const GAS_TOKEN        = 'as2025nthu';
-const R2_BASE          = 'https://pub-d1170515a6a547b0a0b191a7fe809b1e.r2.dev';
+const R2_BASE          = 'https://archsense-r2.projectana-nthu-hmilab-tw.workers.dev';
 const PRACTICE_VIDEO   = R2_BASE + '/EGVideo_SPACE_05_MODN.mp4';
 const WATCH_THRESHOLD_PCT = 0.65;
 
@@ -1830,7 +1830,7 @@ function finishPractice(){
     document.querySelector('.likert-btn.sel[data-key="prac_'+item.key+'"]')));
   sessionData.practiceData={
     annotationCount:pracState.annotations.length,
-    annotations:pracState.annotations.map(({time,wallClock,emotion})=>({time,wallClock,emotion})),
+    annotations:pracState.annotations.map(({time,wallClock,emotion,tagIndex})=>({time,wallClock,emotion,tagIndex})),
     watchedSeconds:Math.round(pracState.watchedRanges.reduce((s,[a,b])=>s+b-a,0)),
     watchedRanges:pracState.watchedRanges.map(([a,b])=>[Math.round(a*100)/100,Math.round(b*100)/100]),
     videoEnded:pracState.videoEnded||false,
@@ -1950,7 +1950,7 @@ function loadExperimentVideo(){
   // preload next
   if(currentVideoIdx+1<VIDEOS_PER_SESS){
     const nv=assignedVideos[currentVideoIdx+1];
-    const pre=document.createElement('video');pre.preload='auto';pre.src=nv.url;pre.load();
+    const pre=document.createElement('video');pre.preload='auto';pre.crossOrigin='anonymous';pre.src=nv.url;pre.load();
     window._preloadedVideo=pre;window._preloadedVideoIdx=currentVideoIdx+1;
   }
 }
@@ -2325,7 +2325,7 @@ function submitPostVideo(){
     lightingAnswer:postState.lightingAnswer,
     lightingCorrect:LIGHTING_ANSWERS[vinfo.videoId]!=='PLACEHOLDER'&&postState.lightingAnswer===LIGHTING_ANSWERS[vinfo.videoId],
     description:postState.descText,hasAudio:postState.audioBlob!==null,
-    timestamps:state.annotations.map(({time,wallClock,emotion})=>({time,wallClock,emotion})),
+    timestamps:state.annotations.map(({time,wallClock,emotion,tagIndex})=>({time,wallClock,emotion,tagIndex})),
     scales:getScaleValues(),
     questDurationSec:state.questStartTime ? Math.round((Date.now()-state.questStartTime)/1000) : null,
     scalesDurationSec:scalesDurationSec,
